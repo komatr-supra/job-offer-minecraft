@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -159,6 +159,11 @@ PrefabInstance:
         type: 3}
       propertyPath: GroundedRadius
       value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8616685848737228371, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
+        type: 3}
+      propertyPath: GroundLayers.m_Bits
+      value: 520
       objectReference: {fileID: 0}
     - target: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
@@ -562,7 +567,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8f45b90360d4c54da50cf7184a098ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookTransform: {fileID: 0}
+  lookTransform: {fileID: 876526087}
+  sphereCastRadius: 0.01
+  buildingDistance: 3
+  visualPrefab: {fileID: 4516091315831166517, guid: fda4db51916321749ac90a8d102c7f69,
+    type: 3}
+  layerMaskGround:
+    serializedVersion: 2
+    m_Bits: 8
+  mapGenerator: {fileID: 2047957733}
 --- !u!4 &876526087 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
@@ -692,9 +705,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b09037bf5d7d644a90db589089e7b68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  widthMap: 40
-  depthMap: 40
-  heightMap: 20
+  widthMap: 20
+  depthMap: 20
+  heightMap: 10
   multiplier: 0.1
   stoneCube: {fileID: 125781902570493931, guid: 86aa80c9ca232ed49943e2844b2522b6,
     type: 3}
