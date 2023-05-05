@@ -14,7 +14,7 @@ public class Builder : MonoBehaviour
     [SerializeField] private GameObject visualPrefab;
     [SerializeField] private LayerMask layerMaskGround;
 
-    [SerializeField] private MapGenerator mapGenerator;
+    [SerializeField] private ChunkGenerator mapGenerator;
     [SerializeField] private float timeToBreakCube = 2f;
     private bool isBuildingMode;
     private bool onMainAction;

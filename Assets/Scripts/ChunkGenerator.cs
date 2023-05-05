@@ -3,22 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapGenerator : MonoBehaviour
+public class ChunkGenerator : MonoBehaviour
 {
+    [SerializeField] private BiomeSO biomeData;
     [SerializeField] private int widthMap;
     [SerializeField] private int depthMap;
     [SerializeField] private int heightMap;
-    [SerializeField] private float multiplier;
     [SerializeField] private Column[,] mapGrid;
     private Dictionary<Vector3Int, CubeData> mapCubeData;
     [SerializeField] private GameObject stoneCube;
     [SerializeField] private GameObject grassCube;
-    [SerializeField] private int softCubesHeightMax = 10;
     [SerializeField] private GameObject snowCube;
-    [Tooltip("Normalized(percent) amount of snow tiles.")]
-    [Range(0, 1)]
-    [SerializeField] private float snowTrigger;
-    private int snowIntHeight;
+    [Tooltip("Height where snow start.")]    
+    [SerializeField] private int snowIntHeight = 20;
+    
 
     private Vector3Int[] neighbourOffsets = {
         new Vector3Int(-1,0,0),
@@ -32,7 +30,7 @@ public class MapGenerator : MonoBehaviour
     {
         mapGrid = new Column[widthMap, depthMap];
         mapCubeData = new();
-        snowIntHeight = (heightMap * snowTrigger).ToInt();
+        
     }
     void Start()
     {
@@ -41,8 +39,8 @@ public class MapGenerator : MonoBehaviour
         {
             for (int z = 0; z < depthMap; z++)
             {
-                int cubeHeight = (Mathf.PerlinNoise(x * multiplier, z * multiplier) * heightMap).ToInt();
-                int softCubesHeight = (Mathf.PerlinNoise(x * multiplier + perlinOffset, z * multiplier + perlinOffset) * softCubesHeightMax).ToInt();
+                int cubeHeight = (Mathf.PerlinNoise(x * biomeData.multiplier, z * biomeData.multiplier) * heightMap).ToInt();
+                int softCubesHeight = (Mathf.PerlinNoise(x * biomeData.multiplier + perlinOffset, z * biomeData.multiplier + perlinOffset) * biomeData.softCubesHeightMax).ToInt();
                 mapGrid[x, z] = new Column(new Vector2Int(x, z), cubeHeight, softCubesHeight);
 
             }
