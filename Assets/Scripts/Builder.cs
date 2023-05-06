@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Linq;
 using System;
-
+using TMPro;
 public class Builder : MonoBehaviour
 {
     [SerializeField] private Transform lookTransform;
@@ -16,6 +16,7 @@ public class Builder : MonoBehaviour
 
     [SerializeField] private ChunkGenerator mapGenerator;
     [SerializeField] private float timeToBreakCube = 2f;
+    [SerializeField] private TextMeshProUGUI tmpro;
     private bool isBuildingMode;
     private bool onMainAction;
     private bool onSecondaryAction;
@@ -30,6 +31,15 @@ public class Builder : MonoBehaviour
     }
     public void OnMainAction(InputValue inputValue)
     {
+        MakeRaycast(out var raycast);
+        var vv = raycast.collider.transform.position.ToVec3Int();
+        //var v = mapGenerator.GetWAllsID(vv);
+        string str = "";
+        //foreach (var item in v)
+        //{
+        //    str += item + "\n";
+        //}
+        tmpro.text = str;
         Debug.Log("main" + inputValue.isPressed);
         onMainAction = inputValue.isPressed;
         if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
@@ -57,7 +67,7 @@ public class Builder : MonoBehaviour
 
     private void BreakBlock(Vector3Int cubePosition)
     {
-        mapGenerator.BreakBloack(cubePosition);
+        //mapGenerator.BreakBlock(cubePosition);
     }
 
     public void OnSecondaryAction(InputValue inputValue)
