@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028334, g: 0.22571328, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -209,6 +209,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8616685848737228382, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
@@ -569,7 +574,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookTransform: {fileID: 876526087}
   sphereCastRadius: 0.01
-  buildingDistance: 3
+  buildingDistance: 4
   visualPrefab: {fileID: 4516091315831166517, guid: fda4db51916321749ac90a8d102c7f69,
     type: 3}
   layerMaskGround:
@@ -707,13 +712,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   widthMap: 20
   depthMap: 20
-  heightMap: 10
-  multiplier: 0.1
-  stoneCube: {fileID: 125781902570493931, guid: 86aa80c9ca232ed49943e2844b2522b6,
+  heightMap: 20
+  biome: {fileID: 11400000, guid: 8aaa7ac5701b4554a8b8f53c333a3aa9, type: 2}
+  usedBlockDatabase: []
+  snowIntHeight: 12
+  blockPrefab: {fileID: 3514807773158458094, guid: da8ac08af46cb0a41b57fec72d7715f7,
     type: 3}
-  grassCube: {fileID: 3609537631154389299, guid: 80a9ae4829e87814d988e637fd237a31,
-    type: 3}
-  softCubesHeightMax: 10
-  snowCube: {fileID: 1196689318865879711, guid: 6e2bc06a817882f4ca9b7ff17d74b56b,
-    type: 3}
-  snowTrigger: 0.671

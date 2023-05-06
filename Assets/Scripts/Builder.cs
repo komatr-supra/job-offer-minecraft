@@ -15,7 +15,6 @@ public class Builder : MonoBehaviour
     [SerializeField] private LayerMask layerMaskGround;
 
     [SerializeField] private MapGenerator mapGenerator;
-    [SerializeField] private float timeToBreakCube = 2f;
     private bool isBuildingMode;
     private bool onMainAction;
     private bool onSecondaryAction;
@@ -35,29 +34,58 @@ public class Builder : MonoBehaviour
         if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
         
     }
-
+    //todo clean
     private IEnumerator DigCoroutine()
     {
-        if(!MakeRaycast(out var raycastHit)) yield break;
-        Vector3Int cubePositionToDestroy = raycastHit.collider.transform.position.ToVec3Int();
+        if(!GetCubePosition(out var cubePositionToDestroy)) yield break;
         float counter = 0;
-        while(MakeRaycast(out var raycast) && onMainAction && !onSecondaryAction)
+        float timeToBreakCube = mapGenerator.GetBreakTime(cubePositionToDestroy);
+        while(/*MakeRaycast(out var raycast) && */onMainAction && !onSecondaryAction)
         {
-            if(cubePositionToDestroy != raycast.collider.transform.position.ToVec3Int()) yield break;
+            if(!MakeRaycast(out var raycast))
+            {
+                yield return null;
+                continue;
+            }
+            if(cubePositionToDestroy != raycast.collider.transform.position.ToVec3Int())
+            {
+                cubePositionToDestroy = raycast.collider.transform.position.ToVec3Int();
+                counter = 0;
+                continue;
+            }
             counter += Time.deltaTime;
             yield return null;
             if(counter > timeToBreakCube)
             {
                 BreakBlock(cubePositionToDestroy);
-                yield break;
+                yield return null;
+                //try next cube
+                if(!GetCubePosition(out cubePositionToDestroy))
+                {
+                    Debug.Log("no more block to dig");
+                    continue;
+                }
+                counter = 0;
+                timeToBreakCube = mapGenerator.GetBreakTime(cubePositionToDestroy);
+                continue;
+                //yield break;
             }
         }
         
     }
-
+    private bool GetCubePosition(out Vector3Int pos)
+    {
+        if(MakeRaycast(out var raycast))
+        {
+            pos = raycast.collider.transform.position.ToVec3Int();
+            return true;
+        }
+        pos = new();
+        return false;
+    }
     private void BreakBlock(Vector3Int cubePosition)
     {
-        mapGenerator.BreakBloack(cubePosition);
+        mapGenerator.BreakBlock(cubePosition);
     }
 
     public void OnSecondaryAction(InputValue inputValue)
@@ -93,9 +121,9 @@ public class Builder : MonoBehaviour
                 visual.transform.position = visualPosition;
                 visual.SetActive(true);
                 if (onSecondaryAction)
-                {
+                {                    
                     PlaceBlock(visualPosition);
-                    onSecondaryAction = false;
+                    onSecondaryAction = false; 
                 }
             }
             yield return null;
@@ -107,7 +135,7 @@ public class Builder : MonoBehaviour
     {
         return Physics.SphereCast(lookTransform.position, sphereCastRadius, lookTransform.forward, out raycastHit, buildingDistance, layerMaskGround);
     }
-
+    //todo inventory return bool
     private void PlaceBlock(Vector3 position)
     {
         mapGenerator.PlaceBlock(position);
