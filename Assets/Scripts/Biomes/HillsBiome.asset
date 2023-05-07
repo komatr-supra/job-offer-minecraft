@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6963a7e3dbc03bb4d864711affc3d6f9, type: 3}
-  m_Name: PlainsBiome
+  m_Name: HillsBiome
   m_EditorClassIdentifier: 
-  biomeName: Plains
-  multiplier: 0.005
+  biomeName: Hills
+  multiplier: 0.05
   softCubesHeightMax: 3
   minimalHeight: 2
-  maximalHeight: 5
+  maximalHeight: 20
   softBlock: 1
   hardBlock: 2
-  topBlock: 0
+  topBlock: 3

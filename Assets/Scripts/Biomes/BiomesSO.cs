@@ -6,7 +6,9 @@ public class BiomesSO : ScriptableObject {
     public string biomeName;
     public float multiplier;
     public int softCubesHeightMax;
-    public BlocksSO softBlock;
-    public BlocksSO hardBlock;
-    public BlocksSO topBlock;
+    public int minimalHeight;
+    public int maximalHeight;
+    public Block softBlock;
+    public Block hardBlock;
+    public Block topBlock;
 }

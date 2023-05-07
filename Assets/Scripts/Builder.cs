@@ -14,7 +14,7 @@ public class Builder : MonoBehaviour
     [SerializeField] private GameObject visualPrefab;
     [SerializeField] private LayerMask layerMaskGround;
 
-    [SerializeField] private MapGenerator mapGenerator;
+    [SerializeField] private ChunkGenerator mapGenerator;
     private bool isBuildingMode;
     private bool onMainAction;
     private bool onSecondaryAction;
@@ -25,7 +25,7 @@ public class Builder : MonoBehaviour
         visual = Instantiate(visualPrefab);
         visual.SetActive(false);
         isBuildingMode = true;
-        StartCoroutine(StartBuildCoroutine());
+        //StartCoroutine(StartBuildCoroutine());
     }
     public void OnMainAction(InputValue inputValue)
     {
@@ -99,7 +99,7 @@ public class Builder : MonoBehaviour
         isBuildingMode = !isBuildingMode;
         if(isBuildingMode)
         {
-            StartCoroutine(StartBuildCoroutine());
+            //StartCoroutine(StartBuildCoroutine());
         }
 
     }
@@ -116,7 +116,7 @@ public class Builder : MonoBehaviour
             {
                 Vector3 hitCubePoint = raycastHit.collider.transform.position;
                 Vector3 pointToCompare = raycastHit.collider.ClosestPointOnBounds(raycastHit.point);
-                List<Vector3> neighbourFreePosition = mapGenerator.GetFreeNeighbourPosition(raycastHit.collider.transform.position.ToVec3Int());
+                List<Vector3> neighbourFreePosition = null;//mapGenerator.GetFreeNeighbourPosition(raycastHit.collider.transform.position.ToVec3Int());
                 Vector3 visualPosition = neighbourFreePosition.OrderBy(vector => Vector3.Distance(pointToCompare, vector)).First();
                 visual.transform.position = visualPosition;
                 visual.SetActive(true);

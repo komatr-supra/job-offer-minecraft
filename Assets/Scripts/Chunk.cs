@@ -1,0 +1,23 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+//this is chunk data unpacker provide the grid system
+public class Chunk
+{
+    //like in minecraft chunk is 16x16x256 it is 65 536 values(cubes) and its ushort
+    
+    private int width = 16;
+    private int height = 256;
+    private int depth = 16;
+    private Vector2Int position;
+    public Vector2Int Position => position;
+    private GridSystem3D<CubeData> chunkGrid;
+    public Chunk(Func<Vector3Int ,CubeData> getCubeData)
+    {        
+        
+        chunkGrid = new GridSystem3D<CubeData>(width, height, depth, (Vector3Int pos) => getCubeData(pos));
+    }
+    
+}
+
