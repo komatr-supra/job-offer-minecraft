@@ -31,16 +31,18 @@ public class Builder : MonoBehaviour
     {
         Debug.Log("main" + inputValue.isPressed);
         onMainAction = inputValue.isPressed;
-        if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
+        //if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
         
     }
     //todo clean
+
+    /*
     private IEnumerator DigCoroutine()
     {
         if(!GetCubePosition(out var cubePositionToDestroy)) yield break;
         float counter = 0;
-        float timeToBreakCube = mapGenerator.GetBreakTime(cubePositionToDestroy);
-        while(/*MakeRaycast(out var raycast) && */onMainAction && !onSecondaryAction)
+        float timeToBreakCube = 1;//mapGenerator.GetBreakTime(cubePositionToDestroy);
+        while(MakeRaycast(out var raycast) && onMainAction && !onSecondaryAction)
         {
             if(!MakeRaycast(out var raycast))
             {
@@ -72,7 +74,7 @@ public class Builder : MonoBehaviour
             }
         }
         
-    }
+    }*/
     private bool GetCubePosition(out Vector3Int pos)
     {
         if(MakeRaycast(out var raycast))
@@ -85,7 +87,7 @@ public class Builder : MonoBehaviour
     }
     private void BreakBlock(Vector3Int cubePosition)
     {
-        mapGenerator.BreakBlock(cubePosition);
+        //mapGenerator.BreakBlock(cubePosition);
     }
 
     public void OnSecondaryAction(InputValue inputValue)
@@ -138,6 +140,6 @@ public class Builder : MonoBehaviour
     //todo inventory return bool
     private void PlaceBlock(Vector3 position)
     {
-        mapGenerator.PlaceBlock(position);
+       // mapGenerator.PlaceBlock(position);
     }
 }

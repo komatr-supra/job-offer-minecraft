@@ -6,20 +6,67 @@ using UnityEngine;
 public class ChunkGenerator
 {
     private int snowIntHeight;
-    private WorldConstructor constructor;
     private MapData mapData;
     //test
     private int groundLevel = 10;
-    public ChunkGenerator(WorldConstructor constructor)
-    {
-        this.constructor = constructor;
-    }
     public Chunk GenerateChunk(MapData mapData)
     {
         Debug.Log("generating chunk");
         this.mapData = mapData;
-        return new Chunk(GetCubeData);
+        return ChunkAssembly();
+        //return new Chunk(GetCubeData);
     }
+
+    private Chunk ChunkAssembly()
+    {
+        //chunk is init with 0 = no block
+        var chunk = new Chunk(mapData.position);
+        //use columns, start type to array at start of terrain
+        //position offset in real world
+        Vector2Int worldPositionOffset = mapData.position * 16;
+        //go through x, z(in real world) its x, y (in perlin) 16x16
+        //get terrain height range, how high from wate level is
+        int terrainHeightRange = mapData.biome.maximalHeight - mapData.biome.minimalHeight;
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                float xPosForPerlin = (x + worldPositionOffset.x);
+                float yPosForPerlin = (z + worldPositionOffset.y);
+
+                //how high is terrain
+                int terraintHeight = (Mathf.PerlinNoise(((xPosForPerlin + mapData.hardOffset.x )* mapData.biome.multiplier), 
+                ((yPosForPerlin + mapData.hardOffset.y) * mapData.biome.multiplier)) * terrainHeightRange + groundLevel).ToInt();
+                
+                //how many block of terrain is used by soft cubes?
+                int softCubesHeight = (Mathf.PerlinNoise(((xPosForPerlin + mapData.softOffset.x) * mapData.biome.multiplier), 
+                        ((yPosForPerlin + mapData.softOffset.y) * mapData.biome.multiplier)) * 
+                        mapData.biome.softCubesHeightMax).ToInt();
+
+                //all positions of terrain
+                int softCubesHeightStart = terraintHeight - softCubesHeight;
+                for (int yPosition = 0; yPosition < terraintHeight; yPosition++)
+                {
+                    int index1D = x + (yPosition << 4) + (z << 12);
+                    chunk.cubes[index1D] = terraintHeight > softCubesHeightStart ? 1 : 2;//type of cube
+                }
+
+            }
+        }
+        
+        
+        
+        
+        
+
+
+        
+        //int x = index & 15;
+        //int y = (index >> 4) & 255;
+        //int z = index >> 12;
+        return chunk;
+    }
+    /*
     private CubeData GetCubeData(Vector3Int positionInChunk)
     {
         Vector2Int worldPositionOffset = mapData.position * 16;
@@ -90,7 +137,7 @@ public class ChunkGenerator
         throw new NotImplementedException();
     }
 
-    
+    */
 }
 
 public struct CubeData

@@ -13,6 +13,7 @@ public class MapManager
     private MapGenerator mapGenerator;
     private WorldConstructor worldConstructor;
     private Vector2Int activeChunkMapPos;//this is position of the middle active chunk on the map, grid 3x3 is active
+    public Vector2Int ActiveChunkMapPos => activeChunkMapPos;
     private Vector2Int[] activeChunksOffsets = {
         new Vector2Int(0,0),//this
         new Vector2Int(-1, 0),//left
@@ -37,18 +38,38 @@ public class MapManager
         //prepare 
         mapGenerator = new MapGenerator();
         worldConstructor = new WorldConstructor();
-        chunkGenerator = new ChunkGenerator(worldConstructor);
+        chunkGenerator = new ChunkGenerator();
 
     }
     public void Generate(Vector2Int pos)
     {
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+
+        
+        stopwatch.Start();        
         var v = mapGenerator.GetMapData(pos);
-        chunkGenerator.GenerateChunk(v);
+        stopwatch.Stop();
+        TimeSpan elapsed = stopwatch.Elapsed;
+        Debug.Log("Map data created time: " + elapsed.Milliseconds + " miliseconds");
+
+        stopwatch.Restart();
+        var chunk = chunkGenerator.GenerateChunk(v);
+        stopwatch.Stop();
+        elapsed = stopwatch.Elapsed;
+        Debug.Log("Chunk data created time: " + elapsed.Milliseconds + " miliseconds");
+
+        stopwatch.Restart();
+        worldConstructor.SpawnChunk(chunk);
+        stopwatch.Stop();
+        elapsed = stopwatch.Elapsed;
+        Debug.Log("World buildier time to create chunk: " + elapsed.Milliseconds + " miliseconds");
         //RecalculateActiveChunk(Vector2Int.zero);
     }
     
     private void RecalculateActiveChunk(Vector2Int newChunkPosition)
     {
+        Debug.Log("chunks change");
+        /*
         activeChunkMapPos = newChunkPosition;
         //not optimal? should be adjustable
         Vector2Int[] positionsToPrepare = new Vector2Int[9];//nine squeres
@@ -79,6 +100,7 @@ public class MapManager
         }
         chunkGenerator.Spawn(spawnChunks);
         Debug.Log("new chunk should be callcualated, despawn old one and use his block to build next");
+        */
     }
     
 }

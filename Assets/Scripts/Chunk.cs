@@ -12,11 +12,11 @@ public class Chunk
     private int depth = 16;
     private Vector2Int position;
     public Vector2Int Position => position;
-    private GridSystem3D<CubeData> chunkGrid;
-    public Chunk(Func<Vector3Int ,CubeData> getCubeData)
-    {        
-        
-        chunkGrid = new GridSystem3D<CubeData>(width, height, depth, (Vector3Int pos) => getCubeData(pos));
+    public int[] cubes;
+    public Chunk(Vector2Int position)
+    {
+        this.position = position;
+        cubes = new int[65536];        
     }
     
 }

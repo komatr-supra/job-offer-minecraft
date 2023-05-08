@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private LayerMask layerMaskForPlayerSpawn;
     private Action<Vector2Int> onCharacterPositionChanged;
     private MapManager mapManager;
-bool init;
+    bool init;
     private void Start() {
         StartWorld();
     }
