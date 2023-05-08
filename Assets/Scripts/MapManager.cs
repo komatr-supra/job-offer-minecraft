@@ -26,6 +26,7 @@ public class MapManager
         new Vector2Int(-1, 1),//left bot
     };
     private List<Chunk> activeChunks;
+    public WorldConstructor GetWorldConstructor => worldConstructor;
     public MapManager(int seed, Action<Vector2Int> onCharacterPositionChange)
     {
         onCharacterPositionChange += RecalculateActiveChunk;

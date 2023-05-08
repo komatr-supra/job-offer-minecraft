@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HillsBiome
   m_EditorClassIdentifier: 
   biomeName: Hills
-  multiplier: 0.05
+  multiplier: 0.08
   softCubesHeightMax: 3
   minimalHeight: 2
   maximalHeight: 20

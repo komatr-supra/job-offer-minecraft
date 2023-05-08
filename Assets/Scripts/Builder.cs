@@ -13,8 +13,7 @@ public class Builder : MonoBehaviour
     [SerializeField] private float buildingDistance = 3f;
     [SerializeField] private GameObject visualPrefab;
     [SerializeField] private LayerMask layerMaskGround;
-
-    [SerializeField] private ChunkGenerator mapGenerator;
+    private PlayerBuildLink playerBuildLink;
     private bool isBuildingMode;
     private bool onMainAction;
     private bool onSecondaryAction;
@@ -27,12 +26,18 @@ public class Builder : MonoBehaviour
         isBuildingMode = true;
         //StartCoroutine(StartBuildCoroutine());
     }
+    public void SetBuildLink(PlayerBuildLink playerBuildLink)
+    {
+        this.playerBuildLink = playerBuildLink;
+    }
     public void OnMainAction(InputValue inputValue)
     {
-        Debug.Log("main" + inputValue.isPressed);
-        onMainAction = inputValue.isPressed;
+        if(!inputValue.isPressed) return;
+        if (!inputValue.isPressed || !MakeRaycast(out var raycastHit)) return;
+        Vector3Int hitBlockWorldPosition = raycastHit.collider.transform.position.ToVec3Int();
+        playerBuildLink.Dig(hitBlockWorldPosition);
         //if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
-        
+
     }
     //todo clean
 
@@ -92,8 +97,10 @@ public class Builder : MonoBehaviour
 
     public void OnSecondaryAction(InputValue inputValue)
     {
-        Debug.Log("sec" + inputValue.isPressed);
-        onSecondaryAction = inputValue.isPressed;
+        if (!inputValue.isPressed || !MakeRaycast(out var raycastHit)) return;
+        Vector3 pointOnBlock = raycastHit.collider.ClosestPointOnBounds(raycastHit.point);
+        Vector3Int hitBlockWorldPosition = raycastHit.collider.transform.position.ToVec3Int();
+        PlaceBlock(pointOnBlock, hitBlockWorldPosition, Block.Dirt);
     }
     public void OnBuild(InputValue inputValue)
     {
@@ -124,7 +131,7 @@ public class Builder : MonoBehaviour
                 visual.SetActive(true);
                 if (onSecondaryAction)
                 {                    
-                    PlaceBlock(visualPosition);
+                    
                     onSecondaryAction = false; 
                 }
             }
@@ -138,8 +145,8 @@ public class Builder : MonoBehaviour
         return Physics.SphereCast(lookTransform.position, sphereCastRadius, lookTransform.forward, out raycastHit, buildingDistance, layerMaskGround);
     }
     //todo inventory return bool
-    private void PlaceBlock(Vector3 position)
+    private void PlaceBlock(Vector3 position, Vector3Int hitBlockWorldPosition, Block block)
     {
-       // mapGenerator.PlaceBlock(position);
+       playerBuildLink.PlaceBlock(position, hitBlockWorldPosition, block);
     }
 }
