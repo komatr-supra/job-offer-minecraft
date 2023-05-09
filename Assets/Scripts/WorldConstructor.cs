@@ -3,14 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Timers;
 
 public class WorldConstructor
 {
     private int[][] neighboursLookup;
     private List<Chunk> chunks;
     private BlockPool blockPool;
+    private CounterSimple destroyCounter;
     public WorldConstructor()
-    {        
+    {   
         chunks = new();
         blockPool = new();
         PrepareNeighbours();
@@ -207,11 +209,40 @@ public class WorldConstructor
 
     internal void DestroyBlock(Vector3Int hitBlockWorldPosition)
     {        
+        Debug.Log("destroying block at " + hitBlockWorldPosition);
         //get chunk
         Chunk chunk = GetChunk(hitBlockWorldPosition);
-        blockPool.DisableCube(hitBlockWorldPosition);
         int index = GetIndex(hitBlockWorldPosition);
         chunk.cubes[index] = 0;
+        Debug.Log(chunk.cubes[index]);
+        blockPool.DisableCube(hitBlockWorldPosition);
         UpdateCubesAroundIndexInChunk(chunk, index);
     }
+    private BlocksSO GetBlocksSO(Vector3Int worldPosition)
+    {
+        Chunk chunk = GetChunk(worldPosition);
+        int index = GetIndex(worldPosition);
+        return FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index]);
+    }
+    //this is used only at change
+    public void HandleDestroyChange(bool isActive, Vector3Int cubeWorldPosition, Action onDiggingChanged)
+    {
+        
+        if(isActive)
+        {
+            //get block break time
+            float breakingTime = GetBlocksSO(cubeWorldPosition).minigTime;
+            destroyCounter = new CounterSimple(breakingTime, ()=> DestroyBlock(cubeWorldPosition));
+            destroyCounter.Start();
+            onDiggingChanged += destroyCounter.Stop;
+            
+        }
+        else
+        {
+            //onDiggingChanged -= destroyCounter.Stop;
+            destroyCounter.Stop();
+        }
+    }
+
+    
 }

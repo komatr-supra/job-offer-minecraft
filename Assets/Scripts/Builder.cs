@@ -18,7 +18,8 @@ public class Builder : MonoBehaviour
     private bool onMainAction;
     private bool onSecondaryAction;
     private GameObject visual;
-    private Coroutine digCoroutine;
+    private Transform selectedTransform;
+    private Action onSelectedChange;
     private void Start()
     {
         visual = Instantiate(visualPrefab);
@@ -29,15 +30,33 @@ public class Builder : MonoBehaviour
     public void SetBuildLink(PlayerBuildLink playerBuildLink)
     {
         this.playerBuildLink = playerBuildLink;
+
     }
     public void OnMainAction(InputValue inputValue)
     {
-        if(!inputValue.isPressed) return;
-        if (!inputValue.isPressed || !MakeRaycast(out var raycastHit)) return;
-        Vector3Int hitBlockWorldPosition = raycastHit.collider.transform.position.ToVec3Int();
-        playerBuildLink.Dig(hitBlockWorldPosition);
+        bool isRayHit = MakeRaycast(out var raycastHit);
+        Vector3Int targetedCube = isRayHit ? raycastHit.collider.transform.position.ToVec3Int() : Vector3Int.zero;
+        
+        playerBuildLink.Dig(inputValue.isPressed && isRayHit, targetedCube, onSelectedChange);
+        //if(!inputValue.isPressed) return;
+        //if (!inputValue.isPressed || !MakeRaycast(out var raycastHit)) return;
+        //Vector3Int hitBlockWorldPosition = 
+        //playerBuildLink.Dig(hitBlockWorldPosition);
         //if(onMainAction) digCoroutine = StartCoroutine(DigCoroutine());
 
+    }
+    private void Update()
+    {
+        //check target change
+        Transform newTransform = null;
+        if(MakeRaycast(out var raycast)) newTransform = raycast.collider.transform;
+        if(selectedTransform != newTransform)
+        {
+            Debug.Log("taget changed");
+            selectedTransform = newTransform;
+            onSelectedChange?.Invoke();
+        }
+        
     }
     //todo clean
 

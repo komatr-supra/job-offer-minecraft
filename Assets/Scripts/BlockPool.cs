@@ -33,7 +33,12 @@ public class BlockPool
     }
     public void DisableCube(Vector3Int worldPosition)
     {
-        if(!usedCubes.ContainsKey(worldPosition)) return;
+        Debug.Log("disabling cube at " + worldPosition);
+        if(!usedCubes.ContainsKey(worldPosition))
+        {
+            Debug.Log("cant destroy block at " + worldPosition );
+            return;
+        }
         var cube = usedCubes[worldPosition];
         cube.SetActive(false);
         usedCubes.Remove(worldPosition);
