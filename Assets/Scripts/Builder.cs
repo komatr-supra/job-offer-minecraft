@@ -22,6 +22,7 @@ public class Builder : MonoBehaviour
     private Action onSelectedChange;
     private void Start()
     {
+        onSelectedChange = SelectChanged;
         visual = Instantiate(visualPrefab);
         visual.SetActive(false);
         isBuildingMode = true;
@@ -34,10 +35,17 @@ public class Builder : MonoBehaviour
     }
     public void OnMainAction(InputValue inputValue)
     {
-        bool isRayHit = MakeRaycast(out var raycastHit);
-        Vector3Int targetedCube = isRayHit ? raycastHit.collider.transform.position.ToVec3Int() : Vector3Int.zero;
+        if(inputValue.isPressed && MakeRaycast(out var raycastHit))
+        {
+            playerBuildLink.StartDigging(raycastHit.collider.transform.position.ToVec3Int());
+        }
+        else
+        {
+            SelectChanged();
+        }
+        //Vector3Int targetedCube = isRayHit ? raycastHit.collider.transform.position.ToVec3Int() : Vector3Int.zero;
         
-        playerBuildLink.Dig(inputValue.isPressed && isRayHit, targetedCube, onSelectedChange);
+        
         //if(!inputValue.isPressed) return;
         //if (!inputValue.isPressed || !MakeRaycast(out var raycastHit)) return;
         //Vector3Int hitBlockWorldPosition = 
@@ -54,9 +62,15 @@ public class Builder : MonoBehaviour
         {
             Debug.Log("taget changed");
             selectedTransform = newTransform;
-            onSelectedChange?.Invoke();
+            SelectChanged();
         }
         
+    }
+    private void SelectChanged()
+    {
+        Debug.Log("selection was changed");
+        //todo interaction handler
+        playerBuildLink.StopDigging();
     }
     //todo clean
 

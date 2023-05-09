@@ -4,30 +4,35 @@ using System.Collections.Generic;
 using System.Timers;
 using UnityEngine;
 
-public class CounterSimple : IDisposable
+public class CounterSimple
 {
     private bool isTicking;
     private int targetTick;
     private int ticks;
     private Action onComplete;
-    public CounterSimple(float duration, Action onComplete)
+    private Func<bool> stopAction;
+    public CounterSimple(Action onComplete, Func<bool> stopAction = null)
     {
         this.onComplete = onComplete;
+        this.stopAction = stopAction;
         WorldTimer.Instance.tick += Tick;
-        int durationInTick = Mathf.RoundToInt(duration / WorldTimer.Instance.TickLengh);
-        targetTick = durationInTick > 0 ? durationInTick : 1;
     }
     private void Tick()
     {
         if(!isTicking) return;
+        if(stopAction != null && stopAction()) Stop();
         if(++ticks >= targetTick)
         {
+            Debug.Log("complete counter");
             Stop();
             onComplete?.Invoke();
         }
     }   
-    public void Start()
+    public void Start(float duration)
     {
+        Debug.Log("start tick counter");
+        int durationInTick = Mathf.RoundToInt(duration / WorldTimer.Instance.TickLengh);
+        targetTick = durationInTick > 0 ? durationInTick : 1;
         ticks = 0;
         isTicking = true;
     }
@@ -42,10 +47,7 @@ public class CounterSimple : IDisposable
         ticks = 0;
     }
 
-    public void Dispose()
-    {
-        WorldTimer.Instance.tick -= Tick;
-    }
+    
 }
 
     

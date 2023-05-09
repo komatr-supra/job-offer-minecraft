@@ -10,12 +10,14 @@ public class WorldConstructor
     private int[][] neighboursLookup;
     private List<Chunk> chunks;
     private BlockPool blockPool;
-    private CounterSimple destroyCounter;
+    private Digger digger;
+    private Vector3Int selectedPlace;
     public WorldConstructor()
     {   
         chunks = new();
         blockPool = new();
         PrepareNeighbours();
+        digger = new Digger(() => DestroyBlock(selectedPlace));
     }
 
     private void PrepareNeighbours()
@@ -225,23 +227,15 @@ public class WorldConstructor
         return FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index]);
     }
     //this is used only at change
-    public void HandleDestroyChange(bool isActive, Vector3Int cubeWorldPosition, Action onDiggingChanged)
+    public void StartDigging(Vector3Int worldPosition)
     {
-        
-        if(isActive)
-        {
-            //get block break time
-            float breakingTime = GetBlocksSO(cubeWorldPosition).minigTime;
-            destroyCounter = new CounterSimple(breakingTime, ()=> DestroyBlock(cubeWorldPosition));
-            destroyCounter.Start();
-            onDiggingChanged += destroyCounter.Stop;
-            
-        }
-        else
-        {
-            //onDiggingChanged -= destroyCounter.Stop;
-            destroyCounter.Stop();
-        }
+        Debug.Log("start dig");
+        selectedPlace = worldPosition;
+        digger.StartDigging(GetBlocksSO(worldPosition));
+    }
+    public void StopDigging()
+    {
+        digger.StopDigging();
     }
 
     

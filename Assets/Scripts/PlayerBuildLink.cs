@@ -25,10 +25,7 @@ public class PlayerBuildLink
         return false;
     }
 
-    public void Dig(bool isDigging, Vector3Int hitBlockWorldPosition, Action onSelectedChange)
-    {
-        Debug.Log("called with " + isDigging);
-        worldConstructor.HandleDestroyChange(isDigging, hitBlockWorldPosition, onSelectedChange);
-    }
-    
+    public void StartDigging(Vector3Int worldPosition) => worldConstructor.StartDigging(worldPosition);
+    public void StopDigging() => worldConstructor.StopDigging();
+
 }
