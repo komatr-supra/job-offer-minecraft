@@ -11,9 +11,8 @@ public class CounterSimple
     private int ticks;
     private Action onComplete;
     private Func<bool> stopAction;
-    public CounterSimple(Action onComplete, Func<bool> stopAction = null)
+    public CounterSimple(Func<bool> stopAction = null)
     {
-        this.onComplete = onComplete;
         this.stopAction = stopAction;
         WorldTimer.Instance.tick += Tick;
     }
@@ -28,8 +27,9 @@ public class CounterSimple
             onComplete?.Invoke();
         }
     }   
-    public void Start(float duration)
+    public void Start(float duration, Action onComplete)
     {
+        this.onComplete = onComplete;
         Debug.Log("start tick counter");
         int durationInTick = Mathf.RoundToInt(duration / WorldTimer.Instance.TickLengh);
         targetTick = durationInTick > 0 ? durationInTick : 1;

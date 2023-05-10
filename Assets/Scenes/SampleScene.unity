@@ -130,6 +130,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1312057877075045752, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
+        type: 3}
+      propertyPath: lookTransform
+      value: 
+      objectReference: {fileID: 876526087}
     - target: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
         type: 3}
       propertyPath: m_Name
@@ -273,10 +278,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2a375b4dc6c7b41ad9f52887bf6498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 836918653}
+  playerObject: {fileID: 836918653}
   layerMaskForPlayerSpawn:
     serializedVersion: 2
     m_Bits: 8
+  generatedRadius: 4
 --- !u!4 &241709991
 Transform:
   m_ObjectHideFlags: 0

@@ -18,9 +18,13 @@ public class MapGenerator
         Debug.Log(softOffset);
         Debug.Log(solidOffset);
     }
-    public MapData GetMapData(Vector2Int position)
+    public IEnumerable<MapData> GetMapDatas(IEnumerable<Vector2Int> position)
     {
-        BiomesSO biome = FakeDatabase.Instance.GetBiome((Biome)1);//test
-        return new MapData(biome, position, softOffset, solidOffset);
+        BiomesSO biome = FakeDatabase.Instance.GetBiome((Biome)1);              //test
+        foreach (var item in position)
+        {
+            yield return new MapData(biome, item, softOffset, solidOffset);
+        }
+        
     }
 }

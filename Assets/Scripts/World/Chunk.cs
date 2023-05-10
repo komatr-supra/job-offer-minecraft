@@ -7,9 +7,9 @@ public class Chunk
 {
     //like in minecraft chunk is 16x16x256 it is 65 536 values(cubes) and its ushort
     
-    private int width = 16;
-    private int height = 256;
-    private int depth = 16;
+    //private int width = 16;
+    //private int height = 256;
+    //private int depth = 16;
     private Vector2Int position;
     public Vector2Int Position => position;
     public int[] cubes;

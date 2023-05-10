@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 1978471637655604388}
   - component: {fileID: 5420857361349278248}
   - component: {fileID: 8616685848737228376}
-  - component: {fileID: 836918667}
+  - component: {fileID: 1312057877075045752}
   m_Layer: 8
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &836918667
+--- !u!114 &1312057877075045752
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -363,14 +363,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8616685848737228372}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8f45b90360d4c54da50cf7184a098ca, type: 3}
+  m_Script: {fileID: 11500000, guid: c41fc44f0c533354aa5622a85d434d0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lookTransform: {fileID: 4135013735270702856}
   sphereCastRadius: 0.01
-  buildingDistance: 4
-  visualPrefab: {fileID: 4516091315831166517, guid: fda4db51916321749ac90a8d102c7f69,
-    type: 3}
+  interactDistance: 3
+  visualPrefab: {fileID: 0}
   layerMaskGround:
     serializedVersion: 2
     m_Bits: 8
+  lookTransform: {fileID: 0}

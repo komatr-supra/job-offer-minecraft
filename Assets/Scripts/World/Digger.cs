@@ -8,15 +8,14 @@ public class Digger
     
     private CounterSimple destroyCounter;
     private bool stopFlag;
-    public Digger(Action onComplete)
+    public Digger()
     {
-        destroyCounter = new CounterSimple(onComplete, () => stopFlag);
+        destroyCounter = new CounterSimple(() => stopFlag);
     }
-    public void StartDigging(BlocksSO blockData)
+    public void StartDigging(float digTime, Action onComplete)
     {
         stopFlag = false;
-        float miningTime = blockData.minigTime;
-        destroyCounter.Start(miningTime);
+        destroyCounter.Start(digTime, onComplete);
     }
     public bool StopDigging() => stopFlag = true;
 

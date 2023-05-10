@@ -22,5 +22,9 @@ public static class Extensions
         int z = Mathf.RoundToInt(vector3.z);
         return new Vector3Int(x, y, z);
     }
+    public static Vector2Int ChunkPos(this Vector3 vector3)
+    {
+        return new Vector2Int(vector3.x.ToInt() >> 4, vector3.z.ToInt() >> 4);
+    }
     
 }
