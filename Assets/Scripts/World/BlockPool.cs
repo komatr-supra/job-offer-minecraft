@@ -31,17 +31,17 @@ public class BlockPool
         cube.SetActive(true);
         usedCubes.Add(worldPosition, cube);
     }
-    public void DisableCube(Vector3Int worldPosition)
+    public bool DisableCube(Vector3Int worldPosition)
     {
-        Debug.Log("disabling cube at " + worldPosition);
         if(!usedCubes.ContainsKey(worldPosition))
         {
             Debug.Log("cant destroy block at " + worldPosition );
-            return;
+            return false;
         }
         var cube = usedCubes[worldPosition];
         cube.SetActive(false);
         usedCubes.Remove(worldPosition);
         unusedCubes.Enqueue(cube);
+        return true;
     }
 }

@@ -19,11 +19,11 @@ namespace Map
         {
             activeChunks = new();
             this.mapDrawRadius = mapDrawRadius;
-            //seed handle its basicly map start position in perlin noise => default state
+            //seed handle its basicly map start position in perlin noise => map is  done
             //save only changes?
             if(seed == -1) seed = (int)(System.DateTime.Now.Ticks);
             UnityEngine.Random.InitState(seed);
-            Debug.Log(seed);
+            //Debug.Log(seed);
             this.seed = seed;
 
             //prepare 
@@ -35,7 +35,7 @@ namespace Map
         }
         private void UpdateChunks(IEnumerable<Vector2Int> pos)
         {
-            Chunk[] chunksToCreate = chunkGenerator.GenerateChunk(mapGenerator.GetMapDatas(pos)).ToArray();    
+            Chunk[] chunksToCreate = chunkGenerator.GenerateChunk(mapGenerator.GetMapDatas(pos)).ToArray();
             foreach (var item in chunksToCreate)
             {
                 activeChunks.Add(item);
@@ -46,7 +46,12 @@ namespace Map
         public void StartDigging(Vector3Int worldPosition)
         {
             float digTime = GetBlockSO(worldPosition).minigTime;
-            digger.StartDigging(digTime, () => worldConstructor.DestroyBlock(worldPosition));
+            digger.StartDigging(digTime, () => DestroyBlock(worldPosition));
+        }
+        private void DestroyBlock(Vector3Int worldPosition)
+        {
+            worldConstructor.DestroyBlock(worldPosition);
+            SetCubeDataInChunk(worldPosition, 0);
         }
         public void StopDigging()
         {
@@ -96,15 +101,20 @@ namespace Map
             }
             return activeMapsPositions.ToArray();
         }
-
-        public void RecalculateActiveChunks(Vector2Int newChunkPosition)
-        {
-            Debug.Log("chunks change");
-        }
         public bool TryPlaceBlock(RaycastHit raycast, Block block)
         {
 
             return true;
+        }
+        private void SetCubeDataInChunk(Vector3Int worldPosition, int blockIndexInDatabase)
+        {
+            Vector2Int mapPosition = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
+            Chunk chunk = GetChunk(mapPosition);                    
+            int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
+            chunk.cubes[index] = blockIndexInDatabase;
+            //update neighbours
+            worldConstructor.UpdateNeighbours(chunk, index);
+
         }
 
     }

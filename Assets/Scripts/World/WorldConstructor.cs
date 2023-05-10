@@ -61,11 +61,12 @@ namespace Map
                     //check neighbours, if any of them is 0(empty, then this must be visible)
                     //skip empty nodes
                     if(chunk.cubes[index] == 0) continue;
+                    Vector3Int chunkOffset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
                     foreach (int neighbourIndex in neighboursLookup[index])
                     {
                         if (chunk.cubes[neighbourIndex] == 0)
                         {
-                            Vector3Int cubeWorldPosition = GetPositionInChunk(index) + new Vector3Int(chunk.Position.x* 16, 0, chunk.Position.y * 16);
+                            Vector3Int cubeWorldPosition = GetPositionInChunk(index) + chunkOffset;
                             CreateBlock(cubeWorldPosition, (Block)chunk.cubes[index]);
                             break;
                         }
@@ -89,147 +90,44 @@ namespace Map
             int z = index >> 12;
             return new Vector3Int(x, y, z);
         }
-        //force creating (from complete data)
         private void CreateBlock(Vector3Int worldPosition, Block block)
         {
             blockPool.SetCube(worldPosition, block);
-        }
-        //runtime creating (set data and check block around)
-        private void PlaceBlock(Vector3Int worldPosition, Block block)
+        }        
+        public bool DestroyBlock(Vector3Int blockWorldPosition)
         {
-            CreateBlock(worldPosition, block);
-            //SetBlockAtWorldPosition(worldPosition, block);        
-        }
-        /*
-        private void SetBlockAtWorldPosition(Vector3Int worldPosition, Block block)
+            return blockPool.DisableCube(blockWorldPosition);
+        }        
+        internal void UpdateNeighbours(Chunk chunk, int index)
         {
-            Chunk chunk = GetChunk(worldPosition);
-            int index = GetIndex(worldPosition);
-            chunk.cubes[index] = (int)block;
-            //check neighbours, if they need update
-            UpdateCubesAroundIndexInChunk(chunk, index);
-        }
-        //method for player, or any raycast (this will place block in perfect grid and check if it is possible)
-        public bool TryPlaceBlock(RaycastHit raycast, Block block)
-        {
-            var gridPosition = raycast.collider.transform.position.ToVec3Int();
-            //get chunk        
-            Chunk chunk = GetChunk(gridPosition);
-            Vector3Int chunkOffset = GetChunkOffset(chunk.Position);
-
-            //get chunk index
-            Vector3Int cubePosInChunk = gridPosition;
-            int index = GetIndex(cubePosInChunk);
-
-            //get all neighbours
-            List<int> freeNeighbours = new();
-            foreach (int neighbourID in neighboursLookup[index])
+            foreach (int neighbourIndex in neighboursLookup[index])
             {
-                if (chunk.cubes[neighbourID] == 0) freeNeighbours.Add(neighbourID);
-            }
-            // no neighbours avaliable
-            if (freeNeighbours.Count == 0) return false;
-            
-            //get nearest free cube
-            int chunkIndex = freeNeighbours.OrderBy(x => Vector3.Distance(raycast.point, GetVec3(x) + chunkOffset)).First();
-            Vector3Int positionForNewBlock = GetWorldPosition(chunk, chunkIndex);
-            if (Physics.CheckBox(positionForNewBlock, Vector3.one * 0.49f, Quaternion.identity)) return false;
-            PlaceBlock(positionForNewBlock, block);
-
-            return true;
-        }*/
-        private Vector3Int GetWorldPosition(Chunk chunk, int chunkIndex)
-        {
-            return GetVec3(chunkIndex) + GetChunkOffset(chunk.Position);
-        }
-
-        private Vector3Int GetVec3(int index)
-        {
-            //16 width (X)
-            //256 height (Y)
-            //16 depth (Z)
-            int x = index & 15;
-            int y = (index >> 4) & 255;
-            int z = index >> 12;
-            return new Vector3Int(x, y, z);
-        }
-
-        private static int GetIndex(Vector3Int worldPosition)
-        {
-            return (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
-        }    
-        private static Vector3Int GetChunkOffset(Vector2Int mapPosition)
-        {
-            return new Vector3Int(mapPosition.x << 4, 0, mapPosition.y << 4);
-        }
-        
-
-        private void UpdateCubesAroundIndexInChunk(Chunk chunk, int index)
-        {        
-            //get near nodes with block
-            var neighbours = neighboursLookup[index];
-            //check used neighbour and recalculate visibility
-            foreach (int neighbourIndex in neighbours.Where(x => chunk.cubes[x] != 0))
-            {
-                RefreshCubeVisibility(chunk, neighbourIndex);
+                //empty nodes have got no visual (database[0] is empty)
+                int neighbourBlockDatabaseID = chunk.cubes[neighbourIndex];
+                Debug.Log("this block have data: " + neighbourBlockDatabaseID);
+                if (neighbourBlockDatabaseID == 0) continue;
+                UpdateVisual(chunk, neighbourIndex);
             }
         }
 
-        private void RefreshCubeVisibility(Chunk chunk, int index)
+        private void UpdateVisual(Chunk chunk, int index)
         {
-            bool isInvisible = true;
-            foreach (int neighbour in neighboursLookup[index])
+            foreach (int neighbourIndex in neighboursLookup[index])
             {
-                //neighbour cube is used -> keep looking
-                if(chunk.cubes[neighbour] != 0) continue;
-                //any of the node is free
-                isInvisible = false;
-                break;
-            }
-            Vector3Int worldPosition = GetWorldPosition(chunk, index);
-            if(isInvisible)
-            {
-                //hide cube
-                Debug.Log("hiding cube " + worldPosition);
-                blockPool.DisableCube(worldPosition);
-            }
-            else
-            {
-                //show cube
-                blockPool.SetCube(worldPosition, (Block)chunk.cubes[index]);
-            }
-        }
-/*
-        private Chunk GetChunk(Vector3Int worldPosition)
-        {
-            foreach (var chunk in activeChunks)
-            {
-                if(chunk.Position == GetMapPosition(worldPosition)) return chunk;
-            }
-            Debug.LogError("want choose not loaded chunk!");
-            return default;
-        }*/
+                //this is neighbours of neighbours
+                //one of the neighbours is empty and this cube must be visible
+                if (chunk.cubes[neighbourIndex] == 0)
+                {
+                    int idBlock = chunk.cubes[index];
+                    Vector3Int neighbourWorldPosition = GetPositionInChunk(index) + new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
+                    blockPool.SetCube(neighbourWorldPosition, (Block)idBlock);
+                    Debug.Log("Setting block " + neighbourWorldPosition + " to " + idBlock + " update");
+                    //this will break this neighbour(neighbour of main block)
+                    return;
+                }
 
-        internal void DestroyBlock(Vector3Int hitBlockWorldPosition)
-        {        
-            Debug.Log("destroying block at " + hitBlockWorldPosition);
-            //get chunk
-            //Chunk chunk = GetChunk(hitBlockWorldPosition);
-            //int index = GetIndex(hitBlockWorldPosition);
-            //chunk.cubes[index] = 0;
-            //Debug.Log(chunk.cubes[index]);
-            blockPool.DisableCube(hitBlockWorldPosition);
-            //UpdateCubesAroundIndexInChunk(chunk, index);
+            }
         }
-        /*
-        private BlocksSO GetBlocksSO(Vector3Int worldPosition)
-        {
-            Chunk chunk = GetChunk(worldPosition);
-            int index = GetIndex(worldPosition);
-            return FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index]);
-        }*/
-        //this is used only at change
-        
     }
     
 }
