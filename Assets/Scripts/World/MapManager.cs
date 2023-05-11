@@ -38,9 +38,16 @@ namespace Map
             Chunk[] chunksToCreate = chunkGenerator.GenerateChunk(mapGenerator.GetMapDatas(pos)).ToArray();
             foreach (var item in chunksToCreate)
             {
-                activeChunks.Add(item.Position, item);
+                if(activeChunks.TryAdd(item.Position, item))
+                {
+                    Debug.Log("chunk " + item.Position + " is loading");
+                    worldConstructor.SpawnChunks(chunksToCreate);
+                }
+                else
+                {
+                    Debug.Log("chunk " + item.Position + " is loaded and dont need make it");
+                }
             }        
-            worldConstructor.SpawnChunks(chunksToCreate);
         }
         //this is not the best place?
         public void StartDigging(Vector3Int worldPosition)
@@ -48,22 +55,27 @@ namespace Map
             float digTime = GetBlockSO(worldPosition).minigTime;
             digger.StartDigging(digTime, () => DestroyBlock(worldPosition));
         }
-        private void DestroyBlock(Vector3Int worldPosition)
+        private bool DestroyBlock(Vector3Int worldPosition)
         {
+            if(worldPosition.y == 0) return false;
             Vector2Int mapPosition = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             Chunk chunk = GetChunk(mapPosition);                    
             int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
            
-            worldConstructor.DestroyBlock(chunk, index);
-            SetCubeDataInChunk(worldPosition, 0);
-        }
+            if(worldConstructor.DestroyBlock(chunk, index))
+            {
+                SetCubeDataInChunk(worldPosition, 0);                
+                return true;
+            }
+            return false;
+        }        
         public void StopDigging()
         {
             digger.StopDigging();
         }
         private BlocksSO GetBlockSO(Vector3Int worldPosition)
         {
-            Vector2Int mapPosition = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
+            Vector2Int mapPosition = new Vector2Int(worldPosition.x / 16, worldPosition.z / 16);
             Chunk chunk = GetChunk(mapPosition);
             if(chunk == null)
             {
@@ -77,7 +89,8 @@ namespace Map
         private Chunk GetChunk(Vector2Int mapPosition)
         {
             Chunk chunk = null;
-            if(!activeChunks.TryGetValue(mapPosition, out chunk))            
+            if(activeChunks.TryGetValue(mapPosition, out chunk))            
+            return chunk;
                 Debug.Log("you want change non active chunk " + mapPosition);
             return chunk;
         }
@@ -109,7 +122,34 @@ namespace Map
         }
         public bool TryPlaceBlock(RaycastHit raycast, Block block)
         {
-
+            //height build restrict5ion
+            if(raycast.point.y > 30) return false;
+            //world cube targeted cube
+            Vector3Int worldPosition = raycast.collider.transform.position.ToVec3Int();
+            //world hited point
+            Vector3 worldHitPoint = raycast.point;
+            //get neighbours           
+            Vector2Int mapPosition = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4); 
+            Chunk chunk = GetChunk(mapPosition);
+            int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
+            var neighboursIndexes = worldConstructor.neighboursLookup[index];
+            //find nearest
+            List<Vector3Int> positions = new();
+            foreach (int indexOfNeighbour in neighboursIndexes)
+            {
+                if(chunk.cubes[indexOfNeighbour] != 0) continue;
+                var v = worldConstructor.GetPositionInChunk(indexOfNeighbour);
+                v += new Vector3Int(mapPosition.x * 16, 0, mapPosition.y * 16);
+                positions.Add(v);
+                Debug.Log(v);
+            }
+            //nearest empty
+            var near = positions.OrderBy(x => Vector3.Distance(x, worldHitPoint)).First();
+            index = (near.x & 15) + (near.y << 4) + ((near.z & 15) << 12);
+            Debug.Log("near selected: " + near);
+            Debug.Log("position of hit" + worldHitPoint);
+            worldConstructor.CreateBlock(chunk, index);
+            SetCubeDataInChunk(near, 0);
             return true;
         }
         private void SetCubeDataInChunk(Vector3Int worldPosition, int blockIndexInDatabase)
@@ -136,6 +176,7 @@ namespace Map
                 for (int yy = -mapDrawRadius; yy <= mapDrawRadius; yy++)
                 {
                     var chunk = GetChunk(new Vector2Int(deltedX,yy));
+                    activeChunks.Remove(new Vector2Int(deltedX,yy));
                     worldConstructor.DespawnChunk(chunk);
                 }
             }
@@ -146,6 +187,7 @@ namespace Map
                 for (int xx = -mapDrawRadius; xx <= mapDrawRadius; xx++)
                 {
                     var chunk = GetChunk(new Vector2Int(xx, deletedY));
+                    activeChunks.Remove(new Vector2Int(xx, deletedY));
                     worldConstructor.DespawnChunk(chunk);
                 }
             }

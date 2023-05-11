@@ -9,7 +9,7 @@ namespace Map
 {
     public class WorldConstructor
     {
-        private int[][] neighboursLookup;
+        public int[][] neighboursLookup;
         private BlockPool blockPool;
         public WorldConstructor()
         {   
@@ -81,7 +81,7 @@ namespace Map
             }
         }
         
-        private Vector3Int GetPositionInChunk(int index)
+        public Vector3Int GetPositionInChunk(int index)
         {
             //16 width (X)
             //256 height (Y)
@@ -91,7 +91,7 @@ namespace Map
             int z = index >> 12;
             return new Vector3Int(x, y, z);
         }
-        private void CreateBlock(Chunk chunk, int index)
+        public void CreateBlock(Chunk chunk, int index)
         {
             Vector3Int chunkOffset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
             Vector3Int cubeWorldPosition = GetPositionInChunk(index) + chunkOffset;

@@ -35,7 +35,7 @@ public class BlockPool
     {
         if(!usedCubes.ContainsKey(worldPosition))
         {
-            Debug.Log("cant destroy block at " + worldPosition );
+            //Debug.Log("cant destroy block at " + worldPosition );
             return false;
         }
         var cube = usedCubes[worldPosition];
