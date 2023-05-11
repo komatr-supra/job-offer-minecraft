@@ -23,7 +23,7 @@ namespace Core
         {   
             mapManager = new MapManager(seed, generatedRadius);
             //set player
-            mapManager.PlayerChunkChanged(playerChunkPosition);
+            mapManager.StartMap(playerChunkPosition);
             Vector3 startPoint = Vector3.zero;
             Physics.Raycast(new Vector3(16,300,16), Vector3.down, out RaycastHit raycast, 301f, layerMaskForPlayerSpawn);            
             if(raycast.collider) startPoint = raycast.point;
@@ -46,8 +46,8 @@ namespace Core
                 Vector2Int newPlayerChunkPOsition = playerObject.transform.position.ChunkPos();
                 if(newPlayerChunkPOsition != playerChunkPosition)
                 {
+                    mapManager.PlayerMoved(playerChunkPosition, newPlayerChunkPOsition);
                     playerChunkPosition = newPlayerChunkPOsition;
-                    mapManager.PlayerChunkChanged(playerChunkPosition);
                 }
                 yield return wait;
             }

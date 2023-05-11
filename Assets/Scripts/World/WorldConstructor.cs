@@ -11,8 +11,6 @@ namespace Map
     {
         private int[][] neighboursLookup;
         private BlockPool blockPool;
-        private Digger digger;
-        private Vector3Int selectedPlace;
         public WorldConstructor()
         {   
             blockPool = new();
@@ -61,13 +59,12 @@ namespace Map
                     //check neighbours, if any of them is 0(empty, then this must be visible)
                     //skip empty nodes
                     if(chunk.cubes[index] == 0) continue;
-                    Vector3Int chunkOffset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
                     foreach (int neighbourIndex in neighboursLookup[index])
                     {
                         if (chunk.cubes[neighbourIndex] == 0)
                         {
-                            Vector3Int cubeWorldPosition = GetPositionInChunk(index) + chunkOffset;
-                            CreateBlock(cubeWorldPosition, (Block)chunk.cubes[index]);
+                            
+                            CreateBlock(chunk, index);
                             break;
                         }
                     }
@@ -75,9 +72,13 @@ namespace Map
                 }
             }
         }
-        public void DespawnChunks(Chunk[] chunk)
+        public void DespawnChunk(Chunk chunk)
         {
-
+            if(chunk == null) return;
+            foreach (int blockIndex in chunk.showedNodes)
+            {
+                DestroyBlock(chunk, blockIndex);
+            }
         }
         
         private Vector3Int GetPositionInChunk(int index)
@@ -90,14 +91,25 @@ namespace Map
             int z = index >> 12;
             return new Vector3Int(x, y, z);
         }
-        private void CreateBlock(Vector3Int worldPosition, Block block)
+        private void CreateBlock(Chunk chunk, int index)
         {
-            blockPool.SetCube(worldPosition, block);
-        }        
-        public bool DestroyBlock(Vector3Int blockWorldPosition)
+            Vector3Int chunkOffset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
+            Vector3Int cubeWorldPosition = GetPositionInChunk(index) + chunkOffset;
+            blockPool.SetCube(cubeWorldPosition, (Block)chunk.cubes[index]);
+            chunk.showedNodes.Add(index);
+        }   
+        public bool DestroyBlock(Chunk chunk, int index)
         {
-            return blockPool.DisableCube(blockWorldPosition);
-        }        
+
+            Vector3Int chunkOffset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
+            Vector3Int cubeWorldPosition = GetPositionInChunk(index) + chunkOffset;
+            if(blockPool.DisableCube(cubeWorldPosition))
+            {                
+                return true;
+            }
+            return false;
+        }      
+        
         internal void UpdateNeighbours(Chunk chunk, int index)
         {
             foreach (int neighbourIndex in neighboursLookup[index])
@@ -127,6 +139,26 @@ namespace Map
                 }
 
             }
+        }
+
+        internal void SpawnChunk(Chunk chunk)
+        {
+            for (int index = 0; index < chunk.cubes.Length; index++)
+                {
+                    //check neighbours, if any of them is 0(empty, then this must be visible)
+                    //skip empty nodes
+                    if(chunk.cubes[index] == 0) continue;
+                    foreach (int neighbourIndex in neighboursLookup[index])
+                    {
+                        if (chunk.cubes[neighbourIndex] == 0)
+                        {
+                            
+                            CreateBlock(chunk, index);
+                            break;
+                        }
+                    }
+
+                }
         }
     }
     

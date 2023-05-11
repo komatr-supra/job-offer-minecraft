@@ -13,8 +13,10 @@ public class Chunk
     private Vector2Int position;
     public Vector2Int Position => position;
     public int[] cubes;
+    public List<int> showedNodes;
     public Chunk(Vector2Int position)
     {
+        showedNodes = new();
         this.position = position;
         cubes = new int[65536];        
     }
