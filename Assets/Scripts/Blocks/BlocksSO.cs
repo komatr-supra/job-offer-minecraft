@@ -5,4 +5,5 @@ public class BlocksSO : ScriptableObject {
     public string blockName;
     public Material material;
     public float minigTime;
+    public bool isReplaceable;
 }
