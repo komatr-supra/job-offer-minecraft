@@ -144,12 +144,18 @@ namespace Map
                 Debug.Log(v);
             }
             //nearest empty
-            var near = positions.OrderBy(x => Vector3.Distance(x, worldHitPoint)).First();
-            index = (near.x & 15) + (near.y << 4) + ((near.z & 15) << 12);
-            Debug.Log("near selected: " + near);
+            Vector3Int nearFreePosition = positions.OrderBy(x => Vector3.Distance(x, worldHitPoint)).First();
+            index = (nearFreePosition.x & 15) + (nearFreePosition.y << 4) + ((nearFreePosition.z & 15) << 12);
+            Debug.Log("near selected: " + nearFreePosition);
             Debug.Log("position of hit" + worldHitPoint);
+            //check if place is clear
+            if(Physics.CheckBox(nearFreePosition, Vector3.one * 0.49f, Quaternion.identity))
+            {
+                Debug.Log("place is occupied");
+                return false;
+            } 
             worldConstructor.CreateBlock(chunk, index);
-            SetCubeDataInChunk(near, 0);
+            SetCubeDataInChunk(nearFreePosition, 0);
             return true;
         }
         private void SetCubeDataInChunk(Vector3Int worldPosition, int blockIndexInDatabase)
