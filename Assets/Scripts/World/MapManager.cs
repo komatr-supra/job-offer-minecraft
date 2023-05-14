@@ -49,7 +49,7 @@ namespace Map
         {
             if(worldPosition.y == 0) return false;
             if(mapDataProvider.SetBlockData(worldPosition, Block.none))
-            {                
+            {   
                 return worldConstructor.DestroyBlock(worldPosition);
             }            
             return false;
@@ -92,6 +92,7 @@ namespace Map
             } 
             worldConstructor.CreateBlock(bestNeighbour.worldPosition, block);
             mapDataProvider.SetBlockData(bestNeighbour.worldPosition, block);
+            worldConstructor.UpdateNeighbours(bestNeighbour.worldPosition);
             return true;
         }
         

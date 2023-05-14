@@ -15,4 +15,4 @@ MonoBehaviour:
   blockName: none
   material: {fileID: 0}
   minigTime: 0
-  isReplaceable: 0
+  isReplaceable: 1

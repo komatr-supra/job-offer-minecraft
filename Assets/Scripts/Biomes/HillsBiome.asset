@@ -15,8 +15,8 @@ MonoBehaviour:
   biomeName: Hills
   multiplier: 0.08
   softCubesHeightMax: 3
-  minimalHeight: 2
-  maximalHeight: 20
+  minimalHeight: 90
+  maximalHeight: 150
   softBlock: 1
   hardBlock: 2
   topBlock: 3

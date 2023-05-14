@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Character;
 using UnityEngine;
 using Map;
+using TMPro;
 namespace Core
 {
     public class GameManager : MonoBehaviour
@@ -11,6 +12,7 @@ namespace Core
         [SerializeField] private GameObject playerObject;
         [SerializeField] private LayerMask layerMaskForPlayerSpawn;
         [SerializeField] private int generatedRadius = 4;
+        [SerializeField] private TextMeshProUGUI debug;
         private const float playerPositionCheckingTime = 1f;
         private MapManager mapManager;
         private Vector2Int playerChunkPosition;
@@ -46,11 +48,15 @@ namespace Core
                 Vector2Int newPlayerChunkPOsition = playerObject.transform.position.ChunkPos();
                 if(newPlayerChunkPOsition != playerChunkPosition)
                 {
+                    Debug.Log("player change chunk");
                     mapManager.PlayerMoved(playerChunkPosition, newPlayerChunkPOsition);
                     playerChunkPosition = newPlayerChunkPOsition;
                 }
                 yield return wait;
             }
+        }
+        private void Update() {
+            debug.text = playerChunkPosition.ToString();
         }
         
     }

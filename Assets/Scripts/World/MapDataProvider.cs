@@ -45,11 +45,12 @@ public class MapDataProvider : IDisposable
             {
                 //this is neighbour
                 Vector3Int neighbourPos = offsets[y] + currentPos;                    
-                int chunkIndex = 0;//current chunk
+                ushort chunkIndex = 0;//current chunk
                 //skip Y neighbour out of array(chunks is not connected vertically)
                 if(neighbourPos.y < 0 || neighbourPos.y > 255)
                 {
                     chunkIndex = 5; //no neighbour, but for job system is needed consistent indexing
+                    neighbourPos.y = 0;
                 }
                 //check x                    
                 else if(neighbourPos.x < 0)
@@ -76,12 +77,12 @@ public class MapDataProvider : IDisposable
                     chunkIndex = 4;
                     neighbourPos.z = 0;
                 }
-                int neighbour1DIndexInHisChunk = neighbourPos.x + (neighbourPos.y << 4) + (neighbourPos.z << 12);
+                int neighbour1DIndexInHisChunk = neighbourPos.x | (neighbourPos.y << 4) | (neighbourPos.z << 12);
                 
                 int index1D = x + (y * 65536);
                 //merge datas
                 if(chunkIndex > 5 || chunkIndex < 0) Debug.Log("v pici index ");
-                neighboursLookupDataArray[index1D] = (chunkIndex << 16) | neighbour1DIndexInHisChunk;
+                neighboursLookupDataArray[index1D] = ((chunkIndex << 16) | neighbour1DIndexInHisChunk);
             }
         }
     }
@@ -89,10 +90,12 @@ public class MapDataProvider : IDisposable
     {
         //index = index & 131071;
         //go throught lookupArray
-        int x = index % 65536;
+        int x = index & 65535;//% 65536;
         for (int i = 0; i < 6; i++)
         {
-            yield return neighboursLookupDataArray[(i * 65536) + x];
+            var v = neighboursLookupDataArray[(i << 16) | x];// i * 65536 + x ... x is up to 16
+            if(v >> 16 < 0 || v >> 16 > 5)Debug.Log("napicu data v neighbours lookup data array");
+            yield return v;
         }
     }
     public Vector3Int GetPositionInChunk(int index)
@@ -113,6 +116,7 @@ public class MapDataProvider : IDisposable
         Vector2Int[] map = { mapPosition };
         var mapData = mapGenerator.GetMapDatas(map);
         chunk = chunkGenerator.GenerateChunk(mapData).Single();
+        activeChunks.Add(chunk.Position, chunk);
         return false;        
     }
 
@@ -212,7 +216,8 @@ public class MapDataProvider : IDisposable
 
     internal void AddChunk(Chunk chunk)
     {
-        activeChunks.Add(chunk.Position, chunk);
+        activeChunks.TryAdd(chunk.Position, chunk);
+        Debug.LogWarning("new chunk " + chunk.Position);
     }
 
     public void Dispose()

@@ -20,7 +20,7 @@ namespace Map
         }
         public void SpawnChunk(Chunk chunk)
         {
-            Debug.Log("spawning chunk");
+            //Debug.Log("spawning chunk");
             //get all chunks
             Chunk[] chunks = new Chunk[5];
             chunks[0] = chunk;
@@ -49,17 +49,18 @@ namespace Map
                 int[] neighbourDatas = mapDataProvider.GetNeighboursData(index).ToArray();
                 foreach (int neighbourData in neighbourDatas)
                 {
-                    //Debug.Log("neighbour");
-                    int chunkIndex = (neighbourData >> 16) & 5;
-                    if(chunkIndex == 5) continue;
-                    if(chunkIndex < 0) {Debug.Log("mimo" + chunkIndex); }
                     int neighbourIndex = (neighbourData & 65535);
-                    if(chunkIndex > 5) Debug.Log("hovno" + neighbourIndex + " " + neighbourData);
+                    //Debug.Log("neighbour");
+                    int chunkIndex = (neighbourData >> 16);
+                    chunkIndex = chunkIndex & 7;
+                    if(chunkIndex == 5) continue;
+                    //if(chunkIndex < 0) {Debug.Log("mimo" + chunkIndex); }
+                    //if(chunkIndex > 5) Debug.Log("hovno" + neighbourIndex + " " + neighbourData + " " + chunkIndex);
                     var v = chunks[chunkIndex];
                     int blockData = v.cubes[neighbourIndex];
                     if (blockData == 0)
                     {
-                        CreateBlock(chunks[0].Position, index, (Block)blockData);
+                        CreateBlock(chunks[0].Position, index, (Block)chunks[0].cubes[index]);
                         break;
                     }
                 }
@@ -70,8 +71,8 @@ namespace Map
 
         private void CreateBlock(Vector2Int position, int index, Block block)
         {
-            Vector3Int worldPos = new Vector3Int(position.x >> 4, 0, position.y >> 4) + mapDataProvider.GetPositionInChunk(index);
-            if(worldPos.x < 0 || worldPos.z < 0) Debug.Log("creating block" + worldPos);
+            Vector3Int worldPos = new Vector3Int(position.x << 4, 0, position.y << 4) + mapDataProvider.GetPositionInChunk(index);
+            //if(worldPos.x < 0 || worldPos.z < 0) Debug.Log("creating block" + worldPos);
             CreateBlock(worldPos, block);
         }
 
@@ -89,15 +90,98 @@ public void DespawnChunk(Chunk chunk)
         public void CreateBlock(Vector3Int worldPosition, Block block)
         {
             blockPool.SetCube(worldPosition, block);
+            //int signBitMaskX = worldPosition.x >> 31;
+            //int signBitMaskZ = worldPosition.z >> 31;
+            Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);//((worldPosition.x & 15) | signBitMaskX, (worldPosition.z & 15) | signBitMaskZ);
+            if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
+            {
+                int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
+                int realZWithOffset = worldPosition.z - (mappos.y * 16);
+                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | ((worldPosition.y) << 4) | ((realZWithOffset & 255) << 12);
+                //var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
+                if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
+                {
+                    Debug.Log(realXWithOffset + "is existing id:" + neighbour1DIndexInHisChunk);
+                    return;
+                }
+                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+                Debug.Log("creating " + neighbour1DIndexInHisChunk + " as showed nodes");
+            }        
         }   
+        private void CreateBlock(Vector3Int worldPosition, BlocksSO blockSO)
+        {
+            blockPool.SetCube(worldPosition, blockSO);
+            Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
+            if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
+            {
+                int realXWithOffset = (Mathf.Abs(worldPosition.x) & 15);// mappos.x * 16 (-16) +
+                int realZWithOffset = (Mathf.Abs(worldPosition.y) & 15);
+                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
+                //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
+                if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
+                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+                
+            }
+        }
+        public void UpdateNeighbours(Vector3Int worldPosition)
+        {
+            BlockData[] blockDatas = mapDataProvider.GetNeighbourDatas(worldPosition).ToArray();
+            //each neighbour of the placed block
+            foreach (var neighbour in blockDatas)
+            {
+                //this mean air or water next to the placed block
+                //... its not best, what about glass???? next variable isTransparent?
+                //whatever nothing is changed for anyone
+                if(neighbour.blockSO.isReplaceable) continue;
+                //each neighbour should calculate if something changed(neighbour of this neighbour - its include placed block)
+                bool isVisible = false;
+                foreach (var neighbourNeighbour in mapDataProvider.GetNeighbourDatas(neighbour.worldPosition))
+                {
+                    //if any of the neighbour is replaceable, then this is visible
+                    if(neighbourNeighbour.blockSO.isReplaceable)
+                    {
+                        isVisible = true;
+                        break;
+                    }
+                }
+                //set this block visibility
+                if(isVisible)
+                {
+                    blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
+                }
+                else
+                {
+                    blockPool.DisableCube(neighbour.worldPosition);
+                }
+            }
+        }
         public bool DestroyBlock(Vector3Int worldPosition)
-        {   
+        {
+            UpdateNeighbours(worldPosition);
+            Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
+            if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
+            {
+                int realXWithOffset = (Mathf.Abs(worldPosition.x) & 15);// mappos.x * 16 (-16) +
+                int realZWithOffset = (Mathf.Abs(worldPosition.y) & 15);
+                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
+                //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15) << 12);
+                if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
+                {
+                    chunk.showedNodes.Remove(neighbour1DIndexInHisChunk);
+                }
+            }
             return blockPool.DisableCube(worldPosition);            
         }
 
         internal void DespawnChunk(Chunk chunk)
         {
-            throw new NotImplementedException();
+            //Debug.Log("disabling chunk at position " + chunk.Position* 16);
+            foreach (var item in chunk.showedNodes)
+            {
+                var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
+                Debug.Log(pos + " was deleted from " + chunk.Position* 16);
+                blockPool.DisableCube(pos);
+            }
         }
     }
     

@@ -15,7 +15,7 @@ public class ChunkGenerator
         {
             yield return ChunkAssembly(mapData);
         }
-        Debug.Log("generating chunk");
+        //Debug.Log("generating chunk");
         //this.mapData = mapDataForCreation;
         
         //return new Chunk(GetCubeData);
@@ -25,9 +25,9 @@ public class ChunkGenerator
     {
             //chunk is init with 0 = no block
             var chunk = new Chunk(mapData.position);
-            //use columns, start type to array at start of terrain
-            //position offset in real world
-            Vector2Int worldPositionOffset = mapData.position * 16;
+        //use columns, start type to array at start of terrain
+        //position offset in real world
+        Vector2Int worldPositionOffset = mapData.position;// * 16; each part solo
             //go through x, z(in real world) its x, y (in perlin) 16x16
             //get terrain height range, how high from wate level is
             int terrainHeightRange = mapData.biome.maximalHeight - mapData.biome.minimalHeight;
@@ -35,8 +35,8 @@ public class ChunkGenerator
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    float xPosForPerlin = (x + worldPositionOffset.x);
-                    float yPosForPerlin = (z + worldPositionOffset.y);
+                    float xPosForPerlin = (x | (worldPositionOffset.x << 4));
+                    float yPosForPerlin = (z | (worldPositionOffset.y << 4));
 
                     //how high is terrain
                     int terraintHeight = (Mathf.PerlinNoise(((xPosForPerlin + mapData.hardOffset.x )* mapData.biome.multiplier), 
@@ -51,7 +51,7 @@ public class ChunkGenerator
                     int softCubesHeightStart = terraintHeight - softCubesHeight;
                     for (int yPosition = 0; yPosition < terraintHeight; yPosition++)
                     {
-                        int index1D = x + (yPosition << 4) + (z << 12);
+                        int index1D = x | (yPosition << 4) | (z << 12);
                         chunk.cubes[index1D] = terraintHeight > softCubesHeightStart ? 1 : 2;//type of cube
                     }
 
@@ -62,13 +62,3 @@ public class ChunkGenerator
     
 }
 
-public struct CubeData
-{
-    public GameObject worldCube;//this is not optimal
-    public Block block;//this is block ID from fake block database
-    public CubeData(GameObject worldCube, Block block)
-    {        
-        this.worldCube = worldCube;
-        this.block = block;
-    }
-}
