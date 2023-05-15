@@ -96,32 +96,50 @@ namespace Map
             {
                 int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y * 16);
+                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | ((worldPosition.y) << 4) | ((realZWithOffset & 255) << 12);
                 //var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
                
                 if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
                 {
+<<<<<<< Updated upstream
                     //Debug.Log(realXWithOffset + "is existing id:" + neighbour1DIndexInHisChunk);
                     return;
                 }
                 chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
                 //Debug.Log("creating " + neighbour1DIndexInHisChunk + " as showed nodes");
+=======
+                    return;
+                }
+                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+>>>>>>> Stashed changes
             }        
         }   
         private void CreateBlock(Vector3Int worldPosition, BlocksSO blockSO)
         {
+<<<<<<< Updated upstream
             blockPool.SetCube(worldPosition, blockSO);
             UpdateChunkData(worldPosition);
         }
 
         private void UpdateChunkData(Vector3Int worldPosition)
         {
+=======
+            if(!blockPool.SetCube(worldPosition, blockSO)) return;
+>>>>>>> Stashed changes
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             if (mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
+<<<<<<< Updated upstream
                 int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y * 16);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
+=======
+                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                int realZWithOffset = worldPosition.z - (mappos.y << 4);
+                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
+>>>>>>> Stashed changes
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
                 if (chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
                 chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
@@ -153,6 +171,7 @@ namespace Map
                 //set this block visibility
                 if(isVisible)
                 {
+<<<<<<< Updated upstream
                     
                     blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
                     //UpdateChunkData(worldPosition);
@@ -161,6 +180,26 @@ namespace Map
                 {
                     //blockPool.DisableCube(neighbour.worldPosition);
                     DestroyBlock(neighbour.worldPosition);
+=======
+                    //CreateBlock(neighbour.worldPosition, neighbour.blockSO);
+                    blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
+                    Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
+                    if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
+                    {
+                        int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                        int realZWithOffset = worldPosition.z - (mappos.y << 4);
+                        int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
+                        //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
+                        if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
+                        chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+                
+            }
+                }
+                else
+                {
+                    DestroyBlock(neighbour.worldPosition);
+                    //blockPool.DisableCube(neighbour.worldPosition);
+>>>>>>> Stashed changes
                 }
             }
         }
@@ -170,9 +209,15 @@ namespace Map
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
+<<<<<<< Updated upstream
                 int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y * 16);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
+=======
+                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                int realZWithOffset = worldPosition.z - (mappos.y << 4);
+                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
+>>>>>>> Stashed changes
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15) << 12);
                 if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
                 {

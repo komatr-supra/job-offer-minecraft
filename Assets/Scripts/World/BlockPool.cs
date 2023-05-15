@@ -29,15 +29,16 @@ public class BlockPool
             unusedCubes.Enqueue(cube);
         }
     }
-    public void SetCube(Vector3Int worldPosition, Block block)
+    public bool SetCube(Vector3Int worldPosition, Block block)
     {
-        if(usedCubes.ContainsKey(worldPosition)) return;
+        if(usedCubes.ContainsKey(worldPosition)) return false;
         var cube = unusedCubes.Dequeue();
         cube.transform.position = worldPosition;
         BlocksSO blockData = FakeDatabase.Instance.GetBlock(block);
         cube.GetComponent<MeshRenderer>().material = blockData.material;
         cube.SetActive(true);
         usedCubes.Add(worldPosition, cube);
+        return true;
     }
     public bool SetCube(Vector3Int worldPosition, BlocksSO blockSO)
     {
