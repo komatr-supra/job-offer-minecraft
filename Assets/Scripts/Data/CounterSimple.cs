@@ -22,7 +22,7 @@ public class CounterSimple
         if(stopAction != null && stopAction()) Stop();
         if(++ticks >= targetTick)
         {
-            Debug.Log("complete counter");
+            //Debug.Log("complete counter");
             Stop();
             onComplete?.Invoke();
         }
@@ -30,7 +30,7 @@ public class CounterSimple
     public void Start(float duration, Action onComplete)
     {
         this.onComplete = onComplete;
-        Debug.Log("start tick counter");
+        //Debug.Log("start tick counter");
         int durationInTick = Mathf.RoundToInt(duration / WorldTimer.Instance.TickLengh);
         targetTick = durationInTick > 0 ? durationInTick : 1;
         ticks = 0;
@@ -38,7 +38,7 @@ public class CounterSimple
     }
     public void Stop()
     {
-        Debug.Log("stop tick counter");
+        //Debug.Log("stop tick counter");
         ticks = 0;
         isTicking = false;
     }

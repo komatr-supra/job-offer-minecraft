@@ -14,7 +14,7 @@ namespace Character.State
 
         public void OnEnter()
         {
-            Debug.Log("normal state start");
+            //Debug.Log("normal state start");
         }
 
         public void OnExit()

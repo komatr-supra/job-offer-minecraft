@@ -6,13 +6,14 @@ using System.Linq;
 using Map;
 public class BlockPool
 {
-    private const int prewarmCubesAmount = 100000;
+    private const int prewarmCubesAmount = 150000;
     private Queue<GameObject> unusedCubes;
     private Dictionary<Vector3Int, GameObject> usedCubes;
     private List<Vector3Int> positionsToDestroy;
     private const int MAX_DELETED_COUNT = 100;
     private Coroutine destroyCubeCoroutine;
-    private Dictionary<Vector2Int, int[]> chunksToCreate;
+    private const int MAX_CREATED_CHUNKS = 3;
+    private Dictionary<Vector2Int, uint[]> chunksToCreate;
     private Coroutine createCubeCoroutine;
     public BlockPool()
     {
@@ -87,9 +88,9 @@ public class BlockPool
         destroyCubeCoroutine = null;
     }
 
-    internal void SetCubeAsync(int[] filledCubes, Vector2Int chunkPos)
+    internal void SetCubeAsync(uint[] filledCubes, Vector2Int chunkPos)
     {
-        Debug.Log(chunkPos);
+        //Debug.Log(chunkPos);
         //add to dictionary
         chunksToCreate.TryAdd(chunkPos, filledCubes);
         if(createCubeCoroutine == null)
@@ -102,20 +103,26 @@ public class BlockPool
     {
         while (chunksToCreate.Count > 0)
         {
-            var chunkData = chunksToCreate.First();
-            Vector2Int chunkOffset = chunkData.Key;
-            var blocksIndex = chunkData.Value;
-            foreach (var nodeData in blocksIndex)
+            int repeat = Mathf.Min(MAX_CREATED_CHUNKS, chunksToCreate.Count);
+            for (int i = 0; i < repeat; i++)
             {
-                int blockIndex = nodeData >> 16;
-                int blockID = nodeData & 65535;
-                Vector3Int blockPos = MapDataProvider.GetPositionInChunk(blockIndex);
-                Vector3Int offset = new Vector3Int(chunkOffset.x << 4, 0, chunkOffset.y << 4);
-                SetCube(offset + blockPos, (Block)blockID);
-            
-            //Debug.Log("creating at " + offset + blockPos);
+                var chunkData = chunksToCreate.First();
+                Vector2Int chunkOffset = chunkData.Key;
+                var blocksIndex = chunkData.Value;
+                foreach (var nodeData in blocksIndex)
+                {
+                    uint blockIndex = nodeData >> 16;
+                    uint blockID = nodeData & 65535;
+                    Vector3Int blockPos = MapDataProvider.GetPositionInChunk((int)blockIndex);
+                    Vector3Int offset = new Vector3Int(chunkOffset.x << 4, 0, chunkOffset.y << 4);
+                    SetCube(offset + blockPos, (Block)blockID);
+                
+                //Debug.Log("creating at " + offset + blockPos);
+                }
+                chunksToCreate.Remove(chunkOffset);
+                //Debug.Log("new chunk created");
             }
-            chunksToCreate.Remove(chunkOffset);
+            
             yield return null;
         }
         createCubeCoroutine = null;

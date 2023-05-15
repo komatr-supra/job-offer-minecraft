@@ -20,7 +20,7 @@ namespace Map
         [ReadOnly]
         public NativeArray<int> blockDataBack;
         [WriteOnly]
-        public NativeArray<int> usedBlocks;
+        public NativeArray<uint> usedBlocks;
         public void Execute(int index)
         {
             //check neighbours, if any of them is 0(empty, then this must be visible)
@@ -43,7 +43,7 @@ namespace Map
                     //add THIS INDEX(index) as used cube -> this block is same as used block
                     //its a bit odd, but i want index and block ID from fakedatabase
                     
-                    usedBlocks[index] = index << 16 | blockDataMain[index];
+                    usedBlocks[index] = ((uint)index) << 16 | (uint)blockDataMain[index];
                     break;
                 }
             }

@@ -20,7 +20,7 @@ namespace Core
         bool init;
         private void Start() {
             StartWorld();
-                Invoke("StartPlayer", 2f);
+                Invoke("StartPlayer", 4f);
             
             
         }
@@ -56,7 +56,7 @@ namespace Core
                 Vector2Int newPlayerChunkPOsition = playerObject.transform.position.ChunkPos();
                 if(newPlayerChunkPOsition != playerChunkPosition)
                 {
-                    Debug.Log("player change chunk");
+                    //Debug.Log("player change chunk");
                     mapManager.PlayerMoved(playerChunkPosition, newPlayerChunkPOsition);
                     playerChunkPosition = newPlayerChunkPOsition;
                 }

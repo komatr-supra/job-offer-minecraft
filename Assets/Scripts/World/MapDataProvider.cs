@@ -81,7 +81,7 @@ public class MapDataProvider
                 
                 int index1D = x + (y * 65536);
                 //merge datas
-                if(chunkIndex > 5 || chunkIndex < 0) Debug.Log("v pici index ");
+                //if(chunkIndex > 5 || chunkIndex < 0) Debug.Log("v pici index ");
                 neighboursLookupDataArray[index1D] = ((chunkIndex << 16) | neighbour1DIndexInHisChunk);
             }
         }
@@ -167,7 +167,7 @@ public class MapDataProvider
     internal void AddChunk(Chunk chunk)
     {
         activeChunks.TryAdd(chunk.Position, chunk);
-        Debug.LogWarning("new chunk " + chunk.Position);
+        //Debug.LogWarning("new chunk " + chunk.Position);
     }
 
     

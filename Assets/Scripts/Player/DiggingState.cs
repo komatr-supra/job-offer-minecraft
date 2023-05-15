@@ -25,7 +25,7 @@ namespace Character.State
             if(player.MakeRaycast(out RaycastHit raycast))
             {
                 Vector3Int blockPosition = raycast.collider.transform.position.ToVec3Int();
-                Debug.Log(buildingLink);
+                //Debug.Log(buildingLink);
                 buildingLink.StartDigging(blockPosition);
             }
 

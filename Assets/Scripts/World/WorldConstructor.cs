@@ -36,7 +36,7 @@ namespace Map
             mapDataProvider.GetChunk(backChunkPos, out Chunk chunkBack);
 
             
-            NativeArray<int> createdBlocks = new NativeArray<int>(65536, Allocator.TempJob);
+            NativeArray<uint> createdBlocks = new NativeArray<uint>(65536, Allocator.TempJob);
             var blockDataLeft = new NativeArray<int>(chunkLeft.cubes, Allocator.TempJob);
                 var blockDataRight = new NativeArray<int>(chunkRight.cubes, Allocator.TempJob);
                 var blockDataFront = new NativeArray<int>(chunkFront.cubes, Allocator.TempJob);
@@ -58,19 +58,23 @@ namespace Map
 
             var filledCubes = createdBlocks.Where(x => (x & 65535) != 0).ToArray();//just block data 0 is nothing
             //you should learn hex...
-            //blockPool.SetCubeAsync(filledCubes, chunk.Position);
-            //chunk.showedNodes.AddRange(filledCubes);
-            
+            blockPool.SetCubeAsync(filledCubes, chunk.Position);
+            foreach (var item in filledCubes)
+            {
+                uint index = item >> 16;
+                chunk.showedNodes.Add((int)index);
+            }
+            /*
             foreach (var indexAndBlock in filledCubes)
             {
-                int index = indexAndBlock >> 16;
-                int blockID = indexAndBlock  & 65535;
-                Vector3Int blockPos = MapDataProvider.GetPositionInChunk(index);
+                uint index = indexAndBlock >> 16;
+                uint blockID = indexAndBlock  & 65535;
+                Vector3Int blockPos = MapDataProvider.GetPositionInChunk((int)index);
                 Vector3Int offset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
                 CreateBlock(blockPos + offset, (Block)blockID);
-                Debug.Log("creating " + (blockPos + offset));
+                //Debug.Log("creating " + (blockPos + offset));
             }
-            
+            */
             blockDataBack.Dispose();
             blockDataFront.Dispose();
             blockDataLeft.Dispose();
@@ -94,8 +98,6 @@ namespace Map
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);//((worldPosition.x & 15) | signBitMaskX, (worldPosition.z & 15) | signBitMaskZ);
             if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
-                int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
-                int realZWithOffset = worldPosition.z - (mappos.y * 16);
                 int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | ((worldPosition.y) << 4) | ((realZWithOffset & 255) << 12);
@@ -103,43 +105,25 @@ namespace Map
                
                 if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
                 {
-<<<<<<< Updated upstream
-                    //Debug.Log(realXWithOffset + "is existing id:" + neighbour1DIndexInHisChunk);
                     return;
                 }
                 chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
-                //Debug.Log("creating " + neighbour1DIndexInHisChunk + " as showed nodes");
-=======
-                    return;
-                }
-                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
->>>>>>> Stashed changes
             }        
         }   
         private void CreateBlock(Vector3Int worldPosition, BlocksSO blockSO)
         {
-<<<<<<< Updated upstream
             blockPool.SetCube(worldPosition, blockSO);
             UpdateChunkData(worldPosition);
         }
 
         private void UpdateChunkData(Vector3Int worldPosition)
         {
-=======
-            if(!blockPool.SetCube(worldPosition, blockSO)) return;
->>>>>>> Stashed changes
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             if (mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
-<<<<<<< Updated upstream
-                int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
-                int realZWithOffset = worldPosition.z - (mappos.y * 16);
-                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
-=======
                 int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
->>>>>>> Stashed changes
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
                 if (chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
                 chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
@@ -149,57 +133,30 @@ namespace Map
 
         public void UpdateNeighbours(Vector3Int worldPosition)
         {
+            //this look like as a good place for save
+            BlockData blockData = mapDataProvider.GetBlockDatas(worldPosition);
+            mapDataProvider.GetChunk(blockData.mapPosition, out var chunk);
+            //32-16 index 0-15 block type
+            uint data = (uint)blockData.index1D << 16 | (uint)chunk.cubes[blockData.index1D];
+            chunk.changedNodesData.Add(data);
             BlockData[] blockDatas = mapDataProvider.GetNeighbourDatas(worldPosition).ToArray();
             //each neighbour of the placed block
             foreach (var neighbour in blockDatas)
             {
-                //this mean air or water next to the placed block
-                //... its not best, what about glass???? next variable isTransparent?
-                //whatever nothing is changed for anyone
+                //is neighbour replaceable? -> free
                 if(neighbour.blockSO.isReplaceable) continue;
                 //each neighbour should calculate if something changed(neighbour of this neighbour - its include placed block)
-                bool isVisible = false;
+
                 foreach (var neighbourNeighbour in mapDataProvider.GetNeighbourDatas(neighbour.worldPosition))
                 {
                     //if any of the neighbour is replaceable, then this is visible
-                    if(neighbourNeighbour.blockSO.isReplaceable)
+                    
+                    if(neighbourNeighbour.blockSO.isReplaceable) 
                     {
-                        isVisible = true;
+                        blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
                         break;
                     }
-                }
-                //set this block visibility
-                if(isVisible)
-                {
-<<<<<<< Updated upstream
-                    
-                    blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
-                    //UpdateChunkData(worldPosition);
-                }
-                else
-                {
-                    //blockPool.DisableCube(neighbour.worldPosition);
-                    DestroyBlock(neighbour.worldPosition);
-=======
-                    //CreateBlock(neighbour.worldPosition, neighbour.blockSO);
-                    blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
-                    Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
-                    if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
-                    {
-                        int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
-                        int realZWithOffset = worldPosition.z - (mappos.y << 4);
-                        int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
-                        //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
-                        if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
-                        chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
-                
-            }
-                }
-                else
-                {
-                    DestroyBlock(neighbour.worldPosition);
-                    //blockPool.DisableCube(neighbour.worldPosition);
->>>>>>> Stashed changes
+                    blockPool.DisableCube(neighbour.worldPosition);
                 }
             }
         }
@@ -209,15 +166,9 @@ namespace Map
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
-<<<<<<< Updated upstream
-                int realXWithOffset = worldPosition.x - (mappos.x * 16);// mappos.x * 16 (-16) +
-                int realZWithOffset = worldPosition.z - (mappos.y * 16);
-                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 15) << 12);
-=======
                 int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
->>>>>>> Stashed changes
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15) << 12);
                 if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
                 {
@@ -230,7 +181,8 @@ namespace Map
 
         internal void DespawnChunk(Chunk chunk)
         {
-
+            //save changes
+            FakeSaveSystem.Instance.SaveData(chunk.Position, chunk.changedNodesData.ToArray());
             //Debug.Log("disabling chunk at position " + chunk.Position* 16);
             List<Vector3Int> positionToDestroy = new();
             foreach (var item in chunk.showedNodes)

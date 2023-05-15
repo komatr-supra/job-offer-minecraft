@@ -57,6 +57,17 @@ public class ChunkGenerator
 
                 }
             }
+            //look for saves
+            if(FakeSaveSystem.Instance.TryGetSave(chunk.Position, out uint[] saves))
+            {
+                foreach (var save in saves)
+                {
+                    uint index = save >> 16;
+                    uint blockID = save & 65535;
+
+                    chunk.cubes[(int)index] = (int)blockID;
+                }
+            }
             return chunk;
         }
     
