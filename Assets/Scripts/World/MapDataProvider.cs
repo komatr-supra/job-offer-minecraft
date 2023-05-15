@@ -5,9 +5,9 @@ using System.Linq;
 using Unity.Collections;
 using UnityEngine;
 
-public class MapDataProvider : IDisposable
+public class MapDataProvider
 {
-    public NativeArray<int> neighboursLookupDataArray;
+    public int[] neighboursLookupDataArray;
     private Dictionary<Vector2Int, Chunk> activeChunks;
     private ChunkGenerator chunkGenerator;
     private MapGenerator mapGenerator;
@@ -32,7 +32,7 @@ public class MapDataProvider : IDisposable
     }
     private void PrepareNeighbours()
     {
-        neighboursLookupDataArray = new NativeArray<int>(65536 * 6, Allocator.Persistent);
+        neighboursLookupDataArray = new int[65536 * 6];
         for (int x = 0; x < 65536; x++)
         {            
             Vector3Int currentPos = GetPositionInChunk(x);
@@ -86,19 +86,8 @@ public class MapDataProvider : IDisposable
             }
         }
     }
-    public IEnumerable<int> GetNeighboursData(int index)
-    {
-        //index = index & 131071;
-        //go throught lookupArray
-        int x = index & 65535;//% 65536;
-        for (int i = 0; i < 6; i++)
-        {
-            var v = neighboursLookupDataArray[(i << 16) | x];// i * 65536 + x ... x is up to 16
-            if(v >> 16 < 0 || v >> 16 > 5)Debug.Log("napicu data v neighbours lookup data array");
-            yield return v;
-        }
-    }
-    public Vector3Int GetPositionInChunk(int index)
+    
+    public static Vector3Int GetPositionInChunk(int index)
     {
         //16 width (X)
         //256 height (Y)
@@ -181,8 +170,5 @@ public class MapDataProvider : IDisposable
         Debug.LogWarning("new chunk " + chunk.Position);
     }
 
-    public void Dispose()
-    {
-        neighboursLookupDataArray.Dispose();
-    }
+    
 }

@@ -20,24 +20,32 @@ namespace Core
         bool init;
         private void Start() {
             StartWorld();
+                Invoke("StartPlayer", 2f);
+            
+            
         }
-        public void StartWorld(int seed = -1)
-        {   
-            mapManager = new MapManager(seed, generatedRadius);
-            //set player
+        public void StartPlayer()
+        {
             mapManager.StartMap(playerChunkPosition);
             Vector3 startPoint = Vector3.zero;
-            Physics.Raycast(new Vector3(16,300,16), Vector3.down, out RaycastHit raycast, 301f, layerMaskForPlayerSpawn);            
+            Physics.Raycast(new Vector3(0,300,0), Vector3.down, out RaycastHit raycast, 301f, layerMaskForPlayerSpawn);            
             if(raycast.collider) startPoint = raycast.point;
             else Debug.Log("no ground found");
             playerObject.transform.position = startPoint;
             var player = playerObject.GetComponent<Player>();
             player.Init(new PlayerBuildingLink(mapManager));
             playerObject.SetActive(true);
-            //get Position for map generator
             playerChunkPosition = playerObject.transform.position.ChunkPos();
 
             StartCoroutine(CheckPlayerChunkPosition());
+        }
+        public void StartWorld(int seed = -1)
+        {   
+            mapManager = new MapManager(seed, generatedRadius);
+            //set player
+            
+            //get Position for map generator
+            
             
         }
         private IEnumerator CheckPlayerChunkPosition()

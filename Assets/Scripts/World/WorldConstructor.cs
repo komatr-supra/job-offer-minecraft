@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using System.Timers;
 using Unity.Collections;
+using Unity.Jobs;
 
 namespace Map
 {
@@ -20,73 +21,71 @@ namespace Map
         }
         public void SpawnChunk(Chunk chunk)
         {
-            //Debug.Log("spawning chunk");
             //get all chunks
-            Chunk[] chunks = new Chunk[5];
-            chunks[0] = chunk;
             Vector2Int chunkPos = chunk.Position;
             Vector2Int leftChunkPos = new Vector2Int(-1, 0) + chunkPos;
-            mapDataProvider.GetChunk(leftChunkPos, out Chunk chunk1);
-            chunks[1] = chunk1;//left
-            Vector2Int rightChunkPos = new Vector2Int(1, 0) + chunkPos;
-            mapDataProvider.GetChunk(rightChunkPos, out Chunk chunk2);
-            chunks[2] = chunk2; //right
-            Vector2Int frontChunkPos = new Vector2Int(0, -1) + chunkPos;
-            mapDataProvider.GetChunk(frontChunkPos, out Chunk chunk3);
-            chunks[3] = chunk3; //front
-            Vector2Int backChunkPos = new Vector2Int(0, 1) + chunkPos;
-            mapDataProvider.GetChunk(backChunkPos, out Chunk chunk4);
-            chunks[4] = chunk4; //back
-            //chunks[5] = chunk; //up down => empty
+            mapDataProvider.GetChunk(leftChunkPos, out Chunk chunkLeft);
 
-            for (int index = 0; index < chunks[0].cubes.Length; index++)
+            Vector2Int rightChunkPos = new Vector2Int(1, 0) + chunkPos;
+            mapDataProvider.GetChunk(rightChunkPos, out Chunk chunkRight);
+
+            Vector2Int frontChunkPos = new Vector2Int(0, -1) + chunkPos;
+            mapDataProvider.GetChunk(frontChunkPos, out Chunk chunkFront);
+
+            Vector2Int backChunkPos = new Vector2Int(0, 1) + chunkPos;
+            mapDataProvider.GetChunk(backChunkPos, out Chunk chunkBack);
+
+            
+            NativeArray<int> createdBlocks = new NativeArray<int>(65536, Allocator.TempJob);
+            var blockDataLeft = new NativeArray<int>(chunkLeft.cubes, Allocator.TempJob);
+                var blockDataRight = new NativeArray<int>(chunkRight.cubes, Allocator.TempJob);
+                var blockDataFront = new NativeArray<int>(chunkFront.cubes, Allocator.TempJob);
+                var blockDataBack = new NativeArray<int>(chunkBack.cubes, Allocator.TempJob);
+                NativeArray<int> neigh = new NativeArray<int>(mapDataProvider.neighboursLookupDataArray,Allocator.TempJob);
+            var blockDataMain = new NativeArray<int>(chunk.cubes, Allocator.TempJob);
+            ChunkCreateJob chunkCreateJob = new ChunkCreateJob()
             {
-                //check neighbours, if any of them is 0(empty, then this must be visible)
-                //skip empty nodes
-                
-                if(chunks[0].cubes[index] == 0) continue;
-                
-                int[] neighbourDatas = mapDataProvider.GetNeighboursData(index).ToArray();
-                foreach (int neighbourData in neighbourDatas)
-                {
-                    int neighbourIndex = (neighbourData & 65535);
-                    //Debug.Log("neighbour");
-                    int chunkIndex = (neighbourData >> 16);
-                    chunkIndex = chunkIndex & 7;
-                    if(chunkIndex == 5) continue;
-                    //if(chunkIndex < 0) {Debug.Log("mimo" + chunkIndex); }
-                    //if(chunkIndex > 5) Debug.Log("hovno" + neighbourIndex + " " + neighbourData + " " + chunkIndex);
-                    var v = chunks[chunkIndex];
-                    int blockData = v.cubes[neighbourIndex];
-                    if (blockData == 0)
-                    {
-                        CreateBlock(chunks[0].Position, index, (Block)chunks[0].cubes[index]);
-                        break;
-                    }
-                }
-                
+                blockDataMain = blockDataMain,
+                neighboursLookupDataArray = neigh,
+                blockDataLeft = blockDataLeft,
+                blockDataRight = blockDataRight,
+                blockDataFront = blockDataFront,
+                blockDataBack = blockDataBack,
+                usedBlocks = createdBlocks
+            };
+            JobHandle job = chunkCreateJob.Schedule(65536, 64);
+            job.Complete();
+
+            var filledCubes = createdBlocks.Where(x => (x & 65535) != 0).ToArray();//just block data 0 is nothing
+            //you should learn hex...
+            //blockPool.SetCubeAsync(filledCubes, chunk.Position);
+            //chunk.showedNodes.AddRange(filledCubes);
+            
+            foreach (var indexAndBlock in filledCubes)
+            {
+                int index = indexAndBlock >> 16;
+                int blockID = indexAndBlock  & 65535;
+                Vector3Int blockPos = MapDataProvider.GetPositionInChunk(index);
+                Vector3Int offset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
+                CreateBlock(blockPos + offset, (Block)blockID);
+                Debug.Log("creating " + (blockPos + offset));
             }
             
+            blockDataBack.Dispose();
+            blockDataFront.Dispose();
+            blockDataLeft.Dispose();
+            blockDataRight.Dispose();
+            createdBlocks.Dispose();
+            neigh.Dispose();
+            blockDataMain.Dispose();
         }
 
         private void CreateBlock(Vector2Int position, int index, Block block)
         {
-            Vector3Int worldPos = new Vector3Int(position.x << 4, 0, position.y << 4) + mapDataProvider.GetPositionInChunk(index);
+            Vector3Int worldPos = new Vector3Int(position.x << 4, 0, position.y << 4) + MapDataProvider.GetPositionInChunk(index);
             //if(worldPos.x < 0 || worldPos.z < 0) Debug.Log("creating block" + worldPos);
             CreateBlock(worldPos, block);
         }
-
-        
-
-        /*
-public void DespawnChunk(Chunk chunk)
-{
-   if(chunk == null) return;
-   foreach (int blockIndex in chunk.showedNodes)
-   {
-       DestroyBlock(chunk, blockIndex);
-   }
-}*/
         public void CreateBlock(Vector3Int worldPosition, Block block)
         {
             blockPool.SetCube(worldPosition, block);
@@ -186,15 +185,17 @@ public void DespawnChunk(Chunk chunk)
 
         internal void DespawnChunk(Chunk chunk)
         {
-            
+
             //Debug.Log("disabling chunk at position " + chunk.Position* 16);
+            List<Vector3Int> positionToDestroy = new();
             foreach (var item in chunk.showedNodes)
             {
-                var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
-                Debug.Log(pos + " was deleted from " + chunk.Position* 16);
-                blockPool.DisableCube(pos);
+                positionToDestroy.Add(new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + MapDataProvider.GetPositionInChunk(item));
+                
             }
+            blockPool.DisableCubeAsync(positionToDestroy);
         }
+        
     }
     
 }
