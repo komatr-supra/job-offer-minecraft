@@ -31,14 +31,15 @@ public class BlockPool
         cube.SetActive(true);
         usedCubes.Add(worldPosition, cube);
     }
-    public void SetCube(Vector3Int worldPosition, BlocksSO blockSO)
+    public bool SetCube(Vector3Int worldPosition, BlocksSO blockSO)
     {
-        if(usedCubes.ContainsKey(worldPosition)) return;
+        if(usedCubes.ContainsKey(worldPosition)) return false;
         var cube = unusedCubes.Dequeue();
         cube.transform.position = worldPosition;
         cube.GetComponent<MeshRenderer>().material = blockSO.material;
         cube.SetActive(true);
         usedCubes.Add(worldPosition, cube);
+        return true;
     }
     public bool DisableCube(Vector3Int worldPosition)
     {

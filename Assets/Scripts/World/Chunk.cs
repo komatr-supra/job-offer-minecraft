@@ -14,6 +14,7 @@ public class Chunk
     public Vector2Int Position => position;
     public int[] cubes;
     public List<int> showedNodes;
+    public List<int> changedNodes;
     public Chunk(Vector2Int position)
     {
         showedNodes = new();

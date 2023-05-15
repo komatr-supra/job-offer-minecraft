@@ -120,13 +120,8 @@ public class MapDataProvider : IDisposable
         return false;        
     }
 
-    public void SetCubeDataInChunk(Vector3Int worldPosition, int blockIndexInDatabase)
-    {
-        
 
-    }
-
-    private static Vector2Int GetMapPosition(Vector3Int worldPosition)
+    public static Vector2Int GetMapPosition(Vector3Int worldPosition)
     {
         return new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
     }
@@ -174,41 +169,7 @@ public class MapDataProvider : IDisposable
     {
         return FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index1D]);
     }
-    internal void UpdateNeighbours(Chunk chunk, int index)
-        {
-            /*
-            foreach (int neighbourIndex in neighboursLookupArray[index])
-            {
-                //empty nodes have got no visual (database[0] is empty)
-                int neighbourBlockDatabaseID = chunk.cubes[neighbourIndex];
-                Debug.Log("this block have data: " + neighbourBlockDatabaseID);
-                if (neighbourBlockDatabaseID == 0) continue;
-                UpdateVisual(chunk, neighbourIndex);
-            }
-            */
-        }
-
-        private void UpdateVisual(Chunk chunk, int index)
-        {
-            /*
-            foreach (int neighbourIndex in neighboursLookupArray[index])
-            {
-                //this is neighbours of neighbours
-                //one of the neighbours is empty and this cube must be visible
-                if (chunk.cubes[neighbourIndex] == 0)
-                {
-                    int idBlock = chunk.cubes[index];
-                    Vector3Int neighbourWorldPosition = GetPositionInChunk(index) + new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
-                    blockPool.SetCube(neighbourWorldPosition, (Block)idBlock);
-                    Debug.Log("Setting block " + neighbourWorldPosition + " to " + idBlock + " update");
-                    //this will break this neighbour(neighbour of main block)
-                    return;
-                }
-
-            }
-            */
-        }
-
+    
     internal void RemoveChunk(Chunk chunk)
     {
         activeChunks.Remove(chunk.Position);
