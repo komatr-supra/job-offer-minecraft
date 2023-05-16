@@ -20,7 +20,7 @@ public class MapGenerator
     }
     public IEnumerable<MapData> GetMapDatas(IEnumerable<Vector2Int> position)
     {
-        BiomesSO biome = FakeDatabase.Instance.GetBiome((Biome)0);              //test
+        BiomesSO biome = FakeDatabase.Instance.GetBiome((Biome)1);              //test
         foreach (var item in position)
         {
             yield return new MapData(biome, item, softOffset, solidOffset);

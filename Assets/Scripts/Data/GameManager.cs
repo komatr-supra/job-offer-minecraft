@@ -26,7 +26,7 @@ namespace Core
         }
         public void StartPlayer()
         {
-            mapManager.StartMap(playerChunkPosition);
+            
             Vector3 startPoint = Vector3.zero;
             Physics.Raycast(new Vector3(0,300,0), Vector3.down, out RaycastHit raycast, 301f, layerMaskForPlayerSpawn);            
             if(raycast.collider) startPoint = raycast.point;
@@ -42,9 +42,9 @@ namespace Core
         public void StartWorld(int seed = -1)
         {   
             mapManager = new MapManager(seed, generatedRadius);
-            //set player
             
-            //get Position for map generator
+            mapManager.StartMap(playerChunkPosition);
+            
             
             
         }
