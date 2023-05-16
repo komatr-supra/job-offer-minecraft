@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   biomeName: Plains
   multiplier: 0.005
-  softCubesHeightMax: 5
-  minimalHeight: 2
-  maximalHeight: 5
-  softBlock: 1
+  softCubesHeightMax: 6
+  minimalHeight: 3
+  maximalHeight: 10
+  softBlock: 4
   hardBlock: 2
   topBlock: 0

@@ -9,6 +9,7 @@ public class ChunkGenerator
     private IEnumerable<MapData> mapData;
     //test
     private int groundLevel = 30;
+    private int snowHeight = 70;
     public IEnumerable<Chunk> GenerateChunk(IEnumerable<MapData> mapDataForCreation)
     {
         foreach (MapData mapData in mapDataForCreation)
@@ -53,7 +54,8 @@ public class ChunkGenerator
                     for (int yPosition = 0; yPosition < terraintHeight; yPosition++)
                     {
                         int index1D = x | (yPosition << 4) | (z << 12);
-                        chunk.cubes[index1D] = yPosition > softCubesHeightStart ? 1 : 2;//type of cube
+                        chunk.cubes[index1D] = yPosition < softCubesHeightStart ? 2 : yPosition < snowHeight ? 1 : 3;
+                    //chunk.cubes[index1D] = yPosition > softCubesHeightStart ? 1 : 2;//type of cube
                     }
 
                 }

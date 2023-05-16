@@ -1,59 +1,44 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using Character;
 using UnityEngine;
 using Map;
-using TMPro;
+
+//this is main class control game flow
 namespace Core
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] private GameObject playerObject;
+        [SerializeField] private GameObject playerGameObject;
         [SerializeField] private LayerMask layerMaskForPlayerSpawn;
-        [SerializeField] private int generatedRadius = 4;
-        [SerializeField] private TextMeshProUGUI debug;
-        private const float playerPositionCheckingTime = 1f;
         private MapManager mapManager;
+        private const float playerPositionCheckingTime = 2f;
         private Vector2Int playerChunkPosition;
-        
-        bool init;
-        private void Start() {
-            StartWorld();
-                Invoke("StartPlayer", 4f);
-            
-            
-        }
-        public void StartPlayer()
+        private int generatedRadius = 4;
+       
+        public void StartWorld(int seed)
         {
-            
+            mapManager = new MapManager(seed, generatedRadius);            
+            mapManager.StartMap(playerChunkPosition, SpawnPlayer);
+        }
+        private void SpawnPlayer()
+        {            
             Vector3 startPoint = Vector3.zero;
             Physics.Raycast(new Vector3(0,300,0), Vector3.down, out RaycastHit raycast, 301f, layerMaskForPlayerSpawn);            
             if(raycast.collider) startPoint = raycast.point;
-            else Debug.Log("no ground found");
-            playerObject.transform.position = startPoint;
-            var player = playerObject.GetComponent<Player>();
+            playerGameObject.transform.position = startPoint;
+            var player = playerGameObject.GetComponent<Player>();
             player.Init(new PlayerBuildingLink(mapManager));
-            playerObject.SetActive(true);
-            playerChunkPosition = playerObject.transform.position.ChunkPos();
+            playerGameObject.SetActive(true);
+            playerChunkPosition = playerGameObject.transform.position.ChunkPos();
 
             StartCoroutine(CheckPlayerChunkPosition());
-        }
-        public void StartWorld(int seed = -1)
-        {   
-            mapManager = new MapManager(seed, generatedRadius);
-            
-            mapManager.StartMap(playerChunkPosition);
-            
-            
-            
         }
         private IEnumerator CheckPlayerChunkPosition()
         {
             var wait = new WaitForSeconds(playerPositionCheckingTime);
             while (true)
             {
-                Vector2Int newPlayerChunkPOsition = playerObject.transform.position.ChunkPos();
+                Vector2Int newPlayerChunkPOsition = playerGameObject.transform.position.ChunkPos();
                 if(newPlayerChunkPOsition != playerChunkPosition)
                 {
                     //Debug.Log("player change chunk");
@@ -63,9 +48,5 @@ namespace Core
                 yield return wait;
             }
         }
-        private void Update() {
-            debug.text = playerChunkPosition.ToString();
-        }
-        
     }
 }

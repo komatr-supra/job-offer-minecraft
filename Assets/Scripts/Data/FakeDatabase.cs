@@ -6,7 +6,9 @@ public class FakeDatabase : MonoBehaviour
 {
     [SerializeField] private BiomesSO[] biomes;
     [SerializeField] private BlocksSO[] blocks;
-    
+    //just for test use!!! public access
+    public BiomesSO selectedBiome;
+
     //dont know if it is a good way all block is here, must track it, but reference is only int(ushort)
     public static FakeDatabase Instance;
     private void Awake()
@@ -18,11 +20,9 @@ public class FakeDatabase : MonoBehaviour
         }
         Instance = this;
     }
-    public BiomesSO GetBiome(Biome biome)
-    {
-        return biomes[(int)biome];
-    }
-    
+    public BiomesSO[] GetBiomes() => biomes;
+
+
     public BlocksSO GetBlock(Block blockEnum)
     {
         return blocks[(int)blockEnum];
@@ -35,7 +35,8 @@ public enum Block
         none,
         Dirt,
         Stone,
-        Snow
+        Snow,
+        Grass
     }
     public enum Biome
     {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,15 +13,14 @@ namespace Map
             this.mapDataProvider = mapDataProvider;
             this.worldConstructor = worldConstructor;
         }
-        private void CreateChunks(IEnumerable<Vector2Int> positions)
+        private void CreateChunks(IEnumerable<Vector2Int> positions, Action onComplete = null)
         {
             foreach (Vector2Int position in positions)
             {
                 mapDataProvider.GetChunk(position, out Chunk chunk);
-
-                worldConstructor.SpawnChunk(chunk);
-                
+                worldConstructor.SpawnChunk(chunk);                
             }
+            onComplete?.Invoke();
         }
         private void RemoveChunks(IEnumerable<Vector2Int> positions)
         {
@@ -36,11 +36,11 @@ namespace Map
                 //else Debug.Log("chunk NOT exist!!!");
             }
         }
-        public void StartMap(Vector2Int playerMapPosition)
+        public void StartMap(Vector2Int playerMapPosition, Action onComplete)
         {
             //generate chunks at player position     
             var pos = mapDataProvider.GetUsedMapPositions(playerMapPosition);
-            CreateChunks(pos);
+            CreateChunks(pos, onComplete);
         }
 
 

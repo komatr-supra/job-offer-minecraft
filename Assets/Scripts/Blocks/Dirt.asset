@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Dirt
   m_EditorClassIdentifier: 
   blockName: Dirt
-  material: {fileID: 2100000, guid: 49c3c02661a83fd42b33859cfbf9a17d, type: 2}
+  material: {fileID: 2100000, guid: d805d830c4023774cb6259aca09f431e, type: 2}
   minigTime: 1
   isReplaceable: 0
