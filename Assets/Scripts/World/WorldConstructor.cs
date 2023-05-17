@@ -37,12 +37,12 @@ namespace Map
 
             
             NativeArray<uint> createdBlocks = new NativeArray<uint>(65536, Allocator.TempJob);
-            var blockDataLeft = new NativeArray<int>(chunkLeft.cubes, Allocator.TempJob);
-                var blockDataRight = new NativeArray<int>(chunkRight.cubes, Allocator.TempJob);
-                var blockDataFront = new NativeArray<int>(chunkFront.cubes, Allocator.TempJob);
-                var blockDataBack = new NativeArray<int>(chunkBack.cubes, Allocator.TempJob);
+            var blockDataLeft = new NativeArray<ushort>(chunkLeft.cubes, Allocator.TempJob);
+                var blockDataRight = new NativeArray<ushort>(chunkRight.cubes, Allocator.TempJob);
+                var blockDataFront = new NativeArray<ushort>(chunkFront.cubes, Allocator.TempJob);
+                var blockDataBack = new NativeArray<ushort>(chunkBack.cubes, Allocator.TempJob);
                 NativeArray<int> neigh = new NativeArray<int>(mapDataProvider.neighboursLookupDataArray,Allocator.TempJob);
-            var blockDataMain = new NativeArray<int>(chunk.cubes, Allocator.TempJob);
+            var blockDataMain = new NativeArray<ushort>(chunk.cubes, Allocator.TempJob);
             ChunkCreateJob chunkCreateJob = new ChunkCreateJob()
             {
                 blockDataMain = blockDataMain,
@@ -62,7 +62,7 @@ namespace Map
             foreach (var item in filledCubes)
             {
                 uint index = item >> 16;
-                chunk.showedNodes.Add((int)index);
+                chunk.showedNodes.Add((ushort)index);
             }
             /*
             foreach (var indexAndBlock in filledCubes)
@@ -103,11 +103,11 @@ namespace Map
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | ((worldPosition.y) << 4) | ((realZWithOffset & 255) << 12);
                 //var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
                
-                if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
+                if(chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk))
                 {
                     return;
                 }
-                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+                chunk.showedNodes.Add((ushort)neighbour1DIndexInHisChunk);
             }        
         }   
         private void CreateBlock(Vector3Int worldPosition, BlocksSO blockSO)
@@ -125,8 +125,8 @@ namespace Map
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
-                if (chunk.showedNodes.Contains(neighbour1DIndexInHisChunk)) return;
-                chunk.showedNodes.Add(neighbour1DIndexInHisChunk);
+                if (chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk)) return;
+                chunk.showedNodes.Add((ushort)neighbour1DIndexInHisChunk);
 
             }
         }
@@ -170,9 +170,9 @@ namespace Map
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
                 //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15) << 12);
-                if(chunk.showedNodes.Contains(neighbour1DIndexInHisChunk))
+                if(chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk))
                 {
-                    chunk.showedNodes.Remove(neighbour1DIndexInHisChunk);
+                    chunk.showedNodes.Remove((ushort)neighbour1DIndexInHisChunk);
                 }
             }
             UpdateNeighbours(worldPosition);

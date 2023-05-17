@@ -133,7 +133,7 @@ namespace Map
             //chunk is not ready
             if (!GetChunk(mapPosition, out Chunk chunk)) return false;
             int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
-            chunk.cubes[index] = (int)block;
+            chunk.cubes[index] = (ushort)block;
             return true;
             //update neighbours
         }

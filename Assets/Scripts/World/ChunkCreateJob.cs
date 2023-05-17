@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
-using UnityEngine;
+
+//this is for job system, calculate vision of the cubes
+//cubes with all neighbours are not visible
 namespace Map
 {    
     public struct ChunkCreateJob : IJobParallelFor
@@ -10,15 +10,15 @@ namespace Map
         [ReadOnly]
         public NativeArray<int> neighboursLookupDataArray;
         [ReadOnly]
-        public NativeArray<int> blockDataMain;
+        public NativeArray<ushort> blockDataMain;
         [ReadOnly]
-        public NativeArray<int> blockDataLeft;
+        public NativeArray<ushort> blockDataLeft;
         [ReadOnly]
-        public NativeArray<int> blockDataRight;
+        public NativeArray<ushort> blockDataRight;
         [ReadOnly]
-        public NativeArray<int> blockDataFront;
+        public NativeArray<ushort> blockDataFront;
         [ReadOnly]
-        public NativeArray<int> blockDataBack;
+        public NativeArray<ushort> blockDataBack;
         [WriteOnly]
         public NativeArray<uint> usedBlocks;
         public void Execute(int index)
@@ -50,8 +50,6 @@ namespace Map
         }
         private int[] GetNeighboursData(int index)
         {
-            //index = index & 131071;
-            //go throught lookupArray
             int[] neighbourArray = new int[6];
             int x = index & 65535;//% 65536;
             for (int i = 0; i < 6; i++)
@@ -60,7 +58,8 @@ namespace Map
             }
             return neighbourArray;
         }
-        private NativeArray<int> GetBlockData(int i)
+        //this must be same as it is in chunk generator
+        private NativeArray<ushort> GetBlockData(int i)
         {
             switch (i)
             {
