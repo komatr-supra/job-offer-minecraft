@@ -1,27 +1,26 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//this is chunk data unpacker provide the grid system
-public class Chunk
+
+//this is chunk data 
+//like in minecraft chunk is 16x16x256
+// it is 65 536 values(cubes) in 1D indexing and its ushort(16 bits)
+//so its only half size of int
+namespace Map
 {
-    //like in minecraft chunk is 16x16x256 it is 65 536 values(cubes) and its ushort
-    
-    //private int width = 16;
-    //private int height = 256;
-    //private int depth = 16;
-    private Vector2Int position;
-    public Vector2Int Position => position;
-    public int[] cubes;
-    public List<int> showedNodes;
-    public List<uint> changedNodesData;
-    public Chunk(Vector2Int position)
+    public class Chunk
     {
-        changedNodesData = new();
-        showedNodes = new();
-        this.position = position;
-        cubes = new int[65536];        
+        private Vector2Int position;
+        public Vector2Int Position => position;
+        public ushort[] cubes;
+        public List<ushort> showedNodes;
+        public List<uint> changedNodesData;
+        public Chunk(Vector2Int position)
+        {
+            changedNodesData = new();
+            showedNodes = new();
+            this.position = position;
+            cubes = new ushort[65536];                  //number of cubes
+        }
     }
-    
 }
 

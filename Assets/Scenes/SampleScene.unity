@@ -417,7 +417,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8ff3694b84091524ba9d9306fc0efa67, type: 2}
   - {fileID: 11400000, guid: ad229f361a886714b9efd5590aba23d2, type: 2}
   - {fileID: 11400000, guid: e3755c1f1dda7d34e918fe60bf117254, type: 2}
-  selectedBiome: {fileID: 0}
+  selectedBiome: {fileID: 11400000, guid: 8aaa7ac5701b4554a8b8f53c333a3aa9, type: 2}
 --- !u!4 &196035745
 Transform:
   m_ObjectHideFlags: 0
@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de2a375b4dc6c7b41ad9f52887bf6498, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerGameObject: {fileID: 0}
+  playerGameObject: {fileID: 1842624130}
   layerMaskForPlayerSpawn:
     serializedVersion: 2
     m_Bits: 8
@@ -568,6 +568,7 @@ GameObject:
   - component: {fileID: 253977005}
   - component: {fileID: 253977007}
   - component: {fileID: 253977006}
+  - component: {fileID: 253977008}
   m_Layer: 5
   m_Name: MainMenu
   m_TagString: Untagged
@@ -636,6 +637,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 253977004}
   m_CullTransparentMesh: 1
+--- !u!114 &253977008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 253977004}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd43e530f5e29a149b815378495a159e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  background: {fileID: 253977006}
+  biomeSetup: {fileID: 0}
+  inputField: {fileID: 0}
+  gameManager: {fileID: 241709990}
 --- !u!1 &281221375
 GameObject:
   m_ObjectHideFlags: 0
@@ -2577,6 +2594,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1828233976}
   m_CullTransparentMesh: 1
+--- !u!1 &1842624130 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47,
+    type: 3}
+  m_PrefabInstance: {fileID: 51260033}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1900521626
 GameObject:
   m_ObjectHideFlags: 0
@@ -3041,7 +3064,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2143063280}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 241709990}
+        m_TargetAssemblyTypeName: Core.GameManager, Assembly-CSharp
+        m_MethodName: StartWorld
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 253977004}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2143063280
 MonoBehaviour:
   m_ObjectHideFlags: 0

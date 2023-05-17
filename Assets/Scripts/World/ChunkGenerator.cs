@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace Map
+{
 public class ChunkGenerator
 {
     private int snowIntHeight;
@@ -54,7 +56,7 @@ public class ChunkGenerator
                     for (int yPosition = 0; yPosition < terraintHeight; yPosition++)
                     {
                         int index1D = x | (yPosition << 4) | (z << 12);
-                        chunk.cubes[index1D] = yPosition < softCubesHeightStart ? 2 : yPosition < snowHeight ? 1 : 3;
+                        chunk.cubes[index1D] = (ushort)(yPosition < softCubesHeightStart ? 2 : yPosition < snowHeight ? 1 : 3);
                     //chunk.cubes[index1D] = yPosition > softCubesHeightStart ? 1 : 2;//type of cube
                     }
 
@@ -68,11 +70,12 @@ public class ChunkGenerator
                     uint index = save >> 16;
                     uint blockID = save & 65535;
 
-                    chunk.cubes[(int)index] = (int)blockID;
+                    chunk.cubes[(int)index] = (ushort)blockID;
                 }
             }
             return chunk;
         }
     
+}
 }
 

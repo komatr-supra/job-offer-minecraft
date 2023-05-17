@@ -18,7 +18,11 @@ namespace Core
         public void StartWorld(int seed)
         {
             mapManager = new MapManager(seed, generatedRadius);            
-            mapManager.StartMap(playerChunkPosition, SpawnPlayer);
+            mapManager.StartMap(playerChunkPosition, star);
+        }
+        private void star()
+        {
+            Invoke("SpawnPlayer", 2f);
         }
         private void SpawnPlayer()
         {            

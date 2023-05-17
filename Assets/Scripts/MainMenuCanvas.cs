@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class MainMenuCanvas : MonoBehaviour
 {
     [SerializeField] private Image background;
-    [SerializeField] private Dropdown biomeSetup;
-    [SerializeField] private InputField inputField;
+    public Dropdown biomeSetup;
+    public InputField inputField;
     [SerializeField] private Core.GameManager gameManager;
     private void Start() {
         var allBiomes = FakeDatabase.Instance.GetBiomes();
