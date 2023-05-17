@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Snow
   m_EditorClassIdentifier: 
   blockName: Snow
-  material: {fileID: 2100000, guid: f99244a163c0fd54c90bfccdbfc23db2, type: 2}
+  material: {fileID: 2100000, guid: eff9bd1fc3971e7499e63b512110dfef, type: 2}
   minigTime: 0.3
+  isReplaceable: 0

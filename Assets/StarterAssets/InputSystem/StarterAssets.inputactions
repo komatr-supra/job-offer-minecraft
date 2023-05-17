@@ -58,15 +58,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "Build",
-                    "type": "Value",
-                    "id": "289ff631-01f5-4ff9-875b-db89089c823a",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -265,17 +256,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "SecondaryAction",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "6b1ca013-57f9-47ef-bc33-ae5c22585b3a",
-                    "path": "<Keyboard>/f",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Build",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

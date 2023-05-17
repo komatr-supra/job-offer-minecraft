@@ -74,6 +74,10 @@ namespace Map
             chunksToCreate.TryAdd(chunkPos, filledCubes);
             if(createCubeCoroutine == null) createCubeCoroutine = WorldTimer.Instance.StartCoroutine(CreatingCoroutine());          
         }
+        public GameObject GetGameObject(Vector3Int worldPosition)
+        {
+            return usedCubes[worldPosition];
+        }
         #endregion
 
         #region  COROUTINES

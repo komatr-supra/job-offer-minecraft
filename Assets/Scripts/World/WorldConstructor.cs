@@ -192,7 +192,11 @@ namespace Map
             }
             blockPool.DisableCubeAsync(positionToDestroy);
         }
-        
+
+        internal GameObject GetCubeGameObject(Vector3Int worldPosition)
+        {
+            return blockPool.GetGameObject(worldPosition);
+        }
     }
     
 }

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6963a7e3dbc03bb4d864711affc3d6f9, type: 3}
   m_Name: HillsBiome
   m_EditorClassIdentifier: 
+  background: {fileID: 21300000, guid: ee48d413bb297054d9c6b10fcea8f66e, type: 3}
   biomeName: Hills
   multiplier: 0.08
   softCubesHeightMax: 3
   minimalHeight: 90
   maximalHeight: 150
   softBlock: 1
-  hardBlock: 2
+  hardBlock: 6
   topBlock: 3

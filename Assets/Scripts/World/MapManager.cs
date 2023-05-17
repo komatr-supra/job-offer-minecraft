@@ -12,6 +12,8 @@ namespace Map
         private MapProcedural mapProcedural;
         private MapDataProvider mapDataProvider;
         private Digger digger;
+        //this is ugly
+        private GameObject selectedCube;
         #endregion
 
         #region CONSTRUCTOR
@@ -51,8 +53,10 @@ namespace Map
         public void StartDigging(Vector3Int worldPosition)
         {
             BlockData blockData = mapDataProvider.GetBlockDatas(worldPosition);
+            selectedCube = worldConstructor.GetCubeGameObject(worldPosition);
             float digTime = blockData.blockSO.minigTime;
             digger.StartDigging(digTime, () => DestroyBlock(worldPosition));
+            selectedCube.GetComponent<MeshRenderer>().material.color = Color.gray;
         }
 
         //just callback method for end of digging... 
@@ -63,6 +67,7 @@ namespace Map
             //set data(clear)
             if(mapDataProvider.SetBlockData(worldPosition, Block.none))
             {   
+                selectedCube.GetComponent<MeshRenderer>().material.color = Color.white;
                 return worldConstructor.DestroyBlock(worldPosition);
             }            
             return false;
@@ -71,6 +76,10 @@ namespace Map
         //player action, to cancel digging
         public void StopDigging()
         {
+            if(selectedCube != null)
+            {
+                selectedCube.GetComponent<MeshRenderer>().material.color = Color.white;
+            }
             digger.StopDigging();
         }
 

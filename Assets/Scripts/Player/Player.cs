@@ -21,15 +21,7 @@ namespace Character
         private StateMachine playerStateMachine;
         private IState currentState ;
         private bool mainActionKey;
-        private bool secondaryActionKey;
-        private void Awake()
-        {
-            
-        }
-        private void Start()
-        {
-            //something changed          
-        }
+        private bool secondaryActionKey;        
         public void Init(PlayerBuildingLink buildingLink)
         {
             playerStateMachine = new StateMachine();
@@ -43,6 +35,7 @@ namespace Character
 
             playerStateMachine.SetState(idle);
         }        
+        
         public void OnMainAction(InputValue inputValue)
         {
             mainActionKey = inputValue.isPressed;

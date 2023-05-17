@@ -36,7 +36,10 @@ public enum Block
         Dirt,
         Stone,
         Snow,
-        Grass
+        Grass,
+        Sand,
+        MountainStone,
+        Grass2
     }
     public enum Biome
     {

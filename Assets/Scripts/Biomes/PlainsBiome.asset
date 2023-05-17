@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6963a7e3dbc03bb4d864711affc3d6f9, type: 3}
   m_Name: PlainsBiome
   m_EditorClassIdentifier: 
+  background: {fileID: 21300000, guid: 2f4d7ca189fc2ff4eae09e747f61a0ac, type: 3}
   biomeName: Plains
-  multiplier: 0.005
-  softCubesHeightMax: 6
-  minimalHeight: 3
-  maximalHeight: 10
-  softBlock: 4
+  multiplier: 0.02
+  softCubesHeightMax: 4
+  minimalHeight: 6
+  maximalHeight: 20
+  softBlock: 7
   hardBlock: 2
-  topBlock: 0
+  topBlock: 3
