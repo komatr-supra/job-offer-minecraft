@@ -38,10 +38,10 @@ namespace Map
             
             NativeArray<uint> createdBlocks = new NativeArray<uint>(65536, Allocator.TempJob);
             var blockDataLeft = new NativeArray<ushort>(chunkLeft.cubes, Allocator.TempJob);
-                var blockDataRight = new NativeArray<ushort>(chunkRight.cubes, Allocator.TempJob);
-                var blockDataFront = new NativeArray<ushort>(chunkFront.cubes, Allocator.TempJob);
-                var blockDataBack = new NativeArray<ushort>(chunkBack.cubes, Allocator.TempJob);
-                NativeArray<int> neigh = new NativeArray<int>(mapDataProvider.neighboursLookupDataArray,Allocator.TempJob);
+            var blockDataRight = new NativeArray<ushort>(chunkRight.cubes, Allocator.TempJob);
+            var blockDataFront = new NativeArray<ushort>(chunkFront.cubes, Allocator.TempJob);
+            var blockDataBack = new NativeArray<ushort>(chunkBack.cubes, Allocator.TempJob);
+            NativeArray<int> neigh = new NativeArray<int>(mapDataProvider.neighboursLookupDataArray,Allocator.TempJob);
             var blockDataMain = new NativeArray<ushort>(chunk.cubes, Allocator.TempJob);
             ChunkCreateJob chunkCreateJob = new ChunkCreateJob()
             {
@@ -88,9 +88,10 @@ namespace Map
         {
             Vector3Int worldPos = new Vector3Int(position.x << 4, 0, position.y << 4) + MapDataProvider.GetPositionInChunk(index);
             //if(worldPos.x < 0 || worldPos.z < 0) Debug.Log("creating block" + worldPos);
-            CreateBlock(worldPos, block);
+            var blocksSO = FakeDatabase.Instance.GetBlock(block);
+            CreateBlock(worldPos, blocksSO);
         }
-        public void CreateBlock(Vector3Int worldPosition, Block block)
+        public void CreateBlock(Vector3Int worldPosition, BlocksSO block)
         {
             blockPool.SetCube(worldPosition, block);
             //int signBitMaskX = worldPosition.x >> 31;
@@ -110,26 +111,6 @@ namespace Map
                 chunk.showedNodes.Add((ushort)neighbour1DIndexInHisChunk);
             }        
         }   
-        private void CreateBlock(Vector3Int worldPosition, BlocksSO blockSO)
-        {
-            blockPool.SetCube(worldPosition, blockSO);
-            UpdateChunkData(worldPosition);
-        }
-
-        private void UpdateChunkData(Vector3Int worldPosition)
-        {
-            Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
-            if (mapDataProvider.GetChunk(mappos, out Chunk chunk))
-            {
-                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
-                int realZWithOffset = worldPosition.z - (mappos.y << 4);
-                int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
-                //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15 )<< 12);
-                if (chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk)) return;
-                chunk.showedNodes.Add((ushort)neighbour1DIndexInHisChunk);
-
-            }
-        }
 
         public void UpdateNeighbours(Vector3Int worldPosition)
         {

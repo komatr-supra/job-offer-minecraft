@@ -15,19 +15,24 @@ namespace Character
         [SerializeField] private GameObject visualPrefab;
         [SerializeField] private LayerMask layerMaskGround;
         [SerializeField] private Transform lookTransform;
+        private Inventory inventory;
         private Transform selectedTransform;
         public Transform SelectedTransform => selectedTransform;
         public Action onSelectedChange;
         private StateMachine playerStateMachine;
         private IState currentState ;
         private bool mainActionKey;
-        private bool secondaryActionKey;        
+        private bool secondaryActionKey;  
+        private void Awake() {
+            
+        }      
         public void Init(PlayerBuildingLink buildingLink)
         {
+            inventory = GetComponent<Inventory>();
             playerStateMachine = new StateMachine();
             IState idle = new NormalState();
             IState digging = new DiggingState(this, buildingLink);
-            IState building = new BuildingState(this, buildingLink); // ADD INVENTORY
+            IState building = new BuildingState(this, buildingLink, inventory); // ADD INVENTORY
             playerStateMachine.AddAnyTransition(idle, NoInput());
 
             playerStateMachine.AddTransition(idle, digging, () => mainActionKey);
@@ -63,6 +68,15 @@ namespace Character
         {
             return Physics.SphereCast(lookTransform.position, sphereCastRadius, lookTransform.forward, out raycastHit, interactDistance, layerMaskGround);
         }
-        
+        private void OnTriggerEnter(Collider other) {
+            //handle drop
+            Debug.Log("trigger enter " + other);
+            if(!other.CompareTag("Drop")) return;
+            if(other.TryGetComponent<Drop>(out Drop drop))
+            {
+                inventory.AddBlockToInventory(drop.BlocksSO, 1);
+                Destroy(other.gameObject);
+            }
+        }
     }
 }

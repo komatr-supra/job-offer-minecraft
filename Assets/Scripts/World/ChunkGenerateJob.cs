@@ -1,9 +1,11 @@
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Burst;
 
 namespace Map
 {
+    [BurstCompile]
     public struct ChunkGenerateJob : IJobParallelFor
     {
         [ReadOnly]

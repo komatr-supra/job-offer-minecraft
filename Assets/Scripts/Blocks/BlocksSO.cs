@@ -6,4 +6,5 @@ public class BlocksSO : ScriptableObject {
     public Material material;
     public float minigTime;
     public bool isReplaceable;
+    public Sprite invSprite;
 }

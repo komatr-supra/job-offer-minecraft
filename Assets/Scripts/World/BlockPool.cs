@@ -40,11 +40,6 @@ namespace Map
         #endregion
 
         #region PUBLIC METHODS
-        public bool SetCube(Vector3Int worldPosition, Block block)
-        {
-            BlocksSO blockData = FakeDatabase.Instance.GetBlock(block);
-            return SetCube(worldPosition, blockData);
-        }
         public bool SetCube(Vector3Int worldPosition, BlocksSO blockSO)
         {
             if(usedCubes.ContainsKey(worldPosition)) return false;
@@ -112,7 +107,7 @@ namespace Map
                         uint blockID = nodeData & 65535;
                         Vector3Int blockPos = MapDataProvider.GetPositionInChunk((int)blockIndex);
                         Vector3Int offset = new Vector3Int(chunkOffset.x << 4, 0, chunkOffset.y << 4);
-                        SetCube(offset + blockPos, (Block)blockID);
+                        SetCube(offset + blockPos, FakeDatabase.Instance.GetBlock((Block)blockID));
                     }
                     chunksToCreate.Remove(chunkOffset);
                 }                

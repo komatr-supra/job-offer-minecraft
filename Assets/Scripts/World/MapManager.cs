@@ -7,6 +7,7 @@ namespace Map
     public class MapManager
     {
         #region VARIABLES
+        private const int MAX_BUID_HEIGHT = 250;
         private int seed;
         private WorldConstructor worldConstructor;
         private MapProcedural mapProcedural;
@@ -65,7 +66,8 @@ namespace Map
             //bottom limit... looks like digging, but no action at the end is changed
             if(worldPosition.y == 0) return false;
             //set data(clear)
-            if(mapDataProvider.SetBlockData(worldPosition, Block.none))
+            var clearBlock = FakeDatabase.Instance.GetBlock(Block.none);
+            if(mapDataProvider.SetBlockData(worldPosition, clearBlock))
             {   
                 selectedCube.GetComponent<MeshRenderer>().material.color = Color.white;
                 return worldConstructor.DestroyBlock(worldPosition);
@@ -84,10 +86,10 @@ namespace Map
         }
 
         //player action build block
-        public bool TryPlaceBlock(RaycastHit raycast, Block block)
+        public bool TryPlaceBlock(RaycastHit raycast, BlocksSO blockSO)
         {
-            //height build restrict5ion
-            if(raycast.point.y > 30) return false;
+            //height build restriction, its dirty, but whz not
+            if(raycast.point.y > MAX_BUID_HEIGHT) return false;
             //world cube targeted cube
             Vector3Int worldPosition = raycast.collider.transform.position.ToVec3Int();
             //world hited point
@@ -113,8 +115,8 @@ namespace Map
                 Debug.Log("place is occupied");
                 return false;
             } 
-            worldConstructor.CreateBlock(bestNeighbour.worldPosition, block);
-            mapDataProvider.SetBlockData(bestNeighbour.worldPosition, block);
+            worldConstructor.CreateBlock(bestNeighbour.worldPosition, blockSO);
+            mapDataProvider.SetBlockData(bestNeighbour.worldPosition, blockSO);
             worldConstructor.UpdateNeighbours(bestNeighbour.worldPosition);
             return true;
         }

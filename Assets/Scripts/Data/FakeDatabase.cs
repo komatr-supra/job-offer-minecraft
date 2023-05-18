@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Linq;
 public class FakeDatabase : MonoBehaviour
 {
     [SerializeField] private BiomesSO[] biomes;
@@ -26,6 +26,14 @@ public class FakeDatabase : MonoBehaviour
     public BlocksSO GetBlock(Block blockEnum)
     {
         return blocks[(int)blockEnum];
+    }
+    public int GetBlocksSOIndex(BlocksSO block)
+    {
+        for (int i = 0; i < blocks.Length; i++)
+        {
+            if(blocks[i] == block) return i;
+        }
+        return -1;
     }
 }
 public enum Block

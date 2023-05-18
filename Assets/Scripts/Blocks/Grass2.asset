@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 177ebc7f95258dd4fb9d1d139534163d, type: 3}
   m_Name: Grass2
   m_EditorClassIdentifier: 
-  blockName: Grass2
+  blockName: Grass
   material: {fileID: 2100000, guid: f9a94780aa94b7c4985400ab0bedcdbb, type: 2}
   minigTime: 1
   isReplaceable: 0
+  invSprite: {fileID: 21300000, guid: 859455806dd67584f925af0a32c93b3e, type: 3}

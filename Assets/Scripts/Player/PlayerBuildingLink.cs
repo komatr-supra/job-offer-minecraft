@@ -15,7 +15,7 @@ namespace Character
         public void StartDigging(Vector3Int worldPosition) => mapManager.StartDigging(worldPosition);
         
         public void StopDigging() => mapManager.StopDigging();
-        public bool PlaceBlock(RaycastHit raycast, Block block) => mapManager.TryPlaceBlock(raycast, block);
+        public bool PlaceBlock(RaycastHit raycast, BlocksSO block) => mapManager.TryPlaceBlock(raycast, block);
     }
 }
 

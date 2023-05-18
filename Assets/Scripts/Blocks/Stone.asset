@@ -15,3 +15,5 @@ MonoBehaviour:
   blockName: Stone
   material: {fileID: 2100000, guid: 224de5a1c3ba5f948af30bd7826e4666, type: 2}
   minigTime: 2
+  isReplaceable: 0
+  invSprite: {fileID: 21300000, guid: ee48cd38eaf695b468beb950581a3b69, type: 3}

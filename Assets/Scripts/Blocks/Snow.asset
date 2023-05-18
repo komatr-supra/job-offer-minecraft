@@ -16,3 +16,4 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: eff9bd1fc3971e7499e63b512110dfef, type: 2}
   minigTime: 0.3
   isReplaceable: 0
+  invSprite: {fileID: 21300000, guid: b59ad8439d1c7b24b96a62022744ba6a, type: 3}

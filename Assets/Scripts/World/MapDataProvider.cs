@@ -127,13 +127,14 @@ namespace Map
             }
         }
 
-        public bool SetBlockData(Vector3Int worldPosition, Block block)
+        public bool SetBlockData(Vector3Int worldPosition, BlocksSO blockSO)
         {
             Vector2Int mapPosition = GetMapPosition(worldPosition);
             //chunk is not ready
             if (!GetChunk(mapPosition, out Chunk chunk)) return false;
             int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
-            chunk.cubes[index] = (ushort)block;
+            int blockID = FakeDatabase.Instance.GetBlocksSOIndex(blockSO);
+            chunk.cubes[index] = (ushort)blockID;
             return true;
             //update neighbours
         }
