@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class InventoryUI : MonoBehaviour
 {
@@ -43,10 +44,14 @@ public class InventoryUI : MonoBehaviour
     private void Deselect()
     {
         Debug.Log("deselect: " + selected);
+        var v = selectionArea.transform.GetChild(selected);
+        v.localScale = Vector3.one;
     }
 
     private void Select()
     {
         Debug.Log("select: " + selected);
+        var v = selectionArea.transform.GetChild(selected);
+        v.localScale = Vector3.one * 2;
     }
 }

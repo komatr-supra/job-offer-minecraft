@@ -24,7 +24,7 @@ public class Inventory : MonoBehaviour
         {
             float sign = Mathf.Sign(scrollDelta);
             int direction = Mathf.RoundToInt(sign);
-
+            MoveSelection(direction);
         }
     }
     private void UpdateSelection()
