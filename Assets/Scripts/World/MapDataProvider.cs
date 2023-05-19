@@ -1,13 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 using UnityEngine;
+
+//main map class, should group all shared methods... not 100% as i want
 namespace Map
 {
     public class MapDataProvider
     {
+        #region VARIABLES
         public int[] neighboursLookupDataArray;
         private Dictionary<Vector2Int, Chunk> activeChunks;
         private ChunkGenerator chunkGenerator;
@@ -15,13 +15,16 @@ namespace Map
         private int mapDrawRadius;
         public int VisionRange => mapDrawRadius;                // this is +- value (its double size square) ans should be in setup
         private Vector3Int[] offsets = {
-        new Vector3Int(-1,0,0),//left
-        new Vector3Int(1,0,0),//right
-        new Vector3Int(0,-1,0),//down
-        new Vector3Int(0,1,0),//up
-        new Vector3Int(0,0,-1),//front
-        new Vector3Int(0,0,1)//back
-    };
+            new Vector3Int(-1,0,0),//left
+            new Vector3Int(1,0,0),//right
+            new Vector3Int(0,-1,0),//down
+            new Vector3Int(0,1,0),//up
+            new Vector3Int(0,0,-1),//front
+            new Vector3Int(0,0,1)//back
+        };
+        #endregion
+
+        #region PREPARE
         public MapDataProvider(int mapDrawRadius)
         {
             this.mapDrawRadius = mapDrawRadius;
@@ -87,6 +90,7 @@ namespace Map
                 }
             }
         }
+        #endregion
 
         public static Vector3Int GetPositionInChunk(int index)
         {
@@ -98,7 +102,6 @@ namespace Map
             int z = index >> 12;
             return new Vector3Int(x, y, z);
         }
-
         public bool GetChunk(Vector2Int mapPosition, out Chunk chunk)
         {
             if (activeChunks.TryGetValue(mapPosition, out chunk)) return true;
@@ -109,13 +112,10 @@ namespace Map
             activeChunks.Add(chunk.Position, chunk);
             return false;
         }
-
-
         public static Vector2Int GetMapPosition(Vector3Int worldPosition)
         {
             return new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
         }
-
         public IEnumerable<Vector2Int> GetUsedMapPositions(Vector2Int playerChunkPosition)
         {
             for (int xx = -mapDrawRadius; xx <= mapDrawRadius; xx++)
@@ -126,7 +126,6 @@ namespace Map
                 }
             }
         }
-
         public bool SetBlockData(Vector3Int worldPosition, BlocksSO blockSO)
         {
             Vector2Int mapPosition = GetMapPosition(worldPosition);
@@ -144,7 +143,7 @@ namespace Map
             Vector2Int mapPosition = GetMapPosition(worldPosition);
             GetChunk(mapPosition, out Chunk chunk);
             int index = (worldPosition.x & 15) + (worldPosition.y << 4) + ((worldPosition.z & 15) << 12);
-            BlocksSO blockType = GetBlockSO(chunk, index);
+            BlocksSO blockType = FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index]);
             return new BlockData(index, mapPosition, blockType, worldPosition);
         }
         public IEnumerable<BlockData> GetNeighbourDatas(Vector3Int worldPosition)
@@ -156,22 +155,9 @@ namespace Map
                 yield return GetBlockDatas(targetPosition);
             }
         }
-        private BlocksSO GetBlockSO(Chunk chunk, int index1D)
-        {
-            return FakeDatabase.Instance.GetBlock((Block)chunk.cubes[index1D]);
-        }
-
-        internal void RemoveChunk(Chunk chunk)
+        public void RemoveChunk(Chunk chunk)
         {
             activeChunks.Remove(chunk.Position);
         }
-
-        internal void AddChunk(Chunk chunk)
-        {
-            activeChunks.TryAdd(chunk.Position, chunk);
-            //Debug.LogWarning("new chunk " + chunk.Position);
-        }
-
-
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+//TICKER its just timer for everything...
 public class WorldTimer : MonoBehaviour
 {
     public static WorldTimer Instance;

@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Timers;
 using UnityEngine;
 
+//this is simply counter, its using WorldTimer script... 0,1s per tick
 public class CounterSimple
-{
+{    
     private bool isTicking;
     private int targetTick;
     private int ticks;
@@ -22,7 +20,6 @@ public class CounterSimple
         if(stopAction != null && stopAction()) Stop();
         if(++ticks >= targetTick)
         {
-            //Debug.Log("complete counter");
             Stop();
             onComplete?.Invoke();
         }
@@ -30,7 +27,6 @@ public class CounterSimple
     public void Start(float duration, Action onComplete)
     {
         this.onComplete = onComplete;
-        //Debug.Log("start tick counter");
         int durationInTick = Mathf.RoundToInt(duration / WorldTimer.Instance.TickLengh);
         targetTick = durationInTick > 0 ? durationInTick : 1;
         ticks = 0;
@@ -38,7 +34,6 @@ public class CounterSimple
     }
     public void Stop()
     {
-        //Debug.Log("stop tick counter");
         ticks = 0;
         isTicking = false;
     }
@@ -46,8 +41,6 @@ public class CounterSimple
     {
         ticks = 0;
     }
-
-    
 }
 
     

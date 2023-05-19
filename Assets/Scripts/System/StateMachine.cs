@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.AI;
-using Object = System.Object;
 
 // Notes
 // 1. What a finite state machine is
@@ -17,6 +14,7 @@ using Object = System.Object;
 //     Separated from states so they can be re-used
 //     Easy transitions from any state
 
+//this is from Jason Weimann - one of the best state machines(simple & universal)
 public class StateMachine
 {
    private IState _currentState;

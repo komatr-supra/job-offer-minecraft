@@ -11,7 +11,6 @@ namespace Map
 {
     public class WorldConstructor
     {
-        
         private BlockPool blockPool;
         MapDataProvider mapDataProvider;
         public WorldConstructor(MapDataProvider mapDataProvider)
@@ -25,16 +24,12 @@ namespace Map
             Vector2Int chunkPos = chunk.Position;
             Vector2Int leftChunkPos = new Vector2Int(-1, 0) + chunkPos;
             mapDataProvider.GetChunk(leftChunkPos, out Chunk chunkLeft);
-
             Vector2Int rightChunkPos = new Vector2Int(1, 0) + chunkPos;
             mapDataProvider.GetChunk(rightChunkPos, out Chunk chunkRight);
-
             Vector2Int frontChunkPos = new Vector2Int(0, -1) + chunkPos;
             mapDataProvider.GetChunk(frontChunkPos, out Chunk chunkFront);
-
             Vector2Int backChunkPos = new Vector2Int(0, 1) + chunkPos;
             mapDataProvider.GetChunk(backChunkPos, out Chunk chunkBack);
-
             
             NativeArray<uint> createdBlocks = new NativeArray<uint>(65536, Allocator.TempJob);
             var blockDataLeft = new NativeArray<ushort>(chunkLeft.cubes, Allocator.TempJob);
@@ -64,17 +59,6 @@ namespace Map
                 uint index = item >> 16;
                 chunk.showedNodes.Add((ushort)index);
             }
-            /*
-            foreach (var indexAndBlock in filledCubes)
-            {
-                uint index = indexAndBlock >> 16;
-                uint blockID = indexAndBlock  & 65535;
-                Vector3Int blockPos = MapDataProvider.GetPositionInChunk((int)index);
-                Vector3Int offset = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4);
-                CreateBlock(blockPos + offset, (Block)blockID);
-                //Debug.Log("creating " + (blockPos + offset));
-            }
-            */
             blockDataBack.Dispose();
             blockDataFront.Dispose();
             blockDataLeft.Dispose();
@@ -82,14 +66,6 @@ namespace Map
             createdBlocks.Dispose();
             neigh.Dispose();
             blockDataMain.Dispose();
-        }
-
-        private void CreateBlock(Vector2Int position, int index, Block block)
-        {
-            Vector3Int worldPos = new Vector3Int(position.x << 4, 0, position.y << 4) + MapDataProvider.GetPositionInChunk(index);
-            //if(worldPos.x < 0 || worldPos.z < 0) Debug.Log("creating block" + worldPos);
-            var blocksSO = FakeDatabase.Instance.GetBlock(block);
-            CreateBlock(worldPos, blocksSO);
         }
         public void CreateBlock(Vector3Int worldPosition, BlocksSO block)
         {
@@ -99,11 +75,9 @@ namespace Map
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);//((worldPosition.x & 15) | signBitMaskX, (worldPosition.z & 15) | signBitMaskZ);
             if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
-                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                int realXWithOffset = worldPosition.x - (mappos.x << 4);
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | ((worldPosition.y) << 4) | ((realZWithOffset & 255) << 12);
-                //var pos = new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + mapDataProvider.GetPositionInChunk(item);
-               
                 if(chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk))
                 {
                     return;
@@ -111,7 +85,6 @@ namespace Map
                 chunk.showedNodes.Add((ushort)neighbour1DIndexInHisChunk);
             }        
         }   
-
         public void UpdateNeighbours(Vector3Int worldPosition)
         {
             //this look like as a good place for save
@@ -126,12 +99,8 @@ namespace Map
             {
                 //is neighbour replaceable? -> free
                 if(neighbour.blockSO.isReplaceable) continue;
-                //each neighbour should calculate if something changed(neighbour of this neighbour - its include placed block)
-
                 foreach (var neighbourNeighbour in mapDataProvider.GetNeighbourDatas(neighbour.worldPosition))
                 {
-                    //if any of the neighbour is replaceable, then this is visible
-                    
                     if(neighbourNeighbour.blockSO.isReplaceable) 
                     {
                         blockPool.SetCube(neighbour.worldPosition, neighbour.blockSO);
@@ -147,10 +116,9 @@ namespace Map
             Vector2Int mappos = new Vector2Int(worldPosition.x >> 4, worldPosition.z >> 4);
             if(mapDataProvider.GetChunk(mappos, out Chunk chunk))
             {
-                int realXWithOffset = worldPosition.x - (mappos.x << 4);// mappos.x * 16 (-16) +
+                int realXWithOffset = worldPosition.x - (mappos.x << 4);
                 int realZWithOffset = worldPosition.z - (mappos.y << 4);
                 int neighbour1DIndexInHisChunk = realXWithOffset & 15 | (worldPosition.y << 4) | ((realZWithOffset & 255) << 12);
-                //int neighbour1DIndexInHisChunk = worldPosition.x & 15 | (worldPosition.y << 4) | ((worldPosition.z & 15) << 12);
                 if(chunk.showedNodes.Contains((ushort)neighbour1DIndexInHisChunk))
                 {
                     chunk.showedNodes.Remove((ushort)neighbour1DIndexInHisChunk);
@@ -159,22 +127,18 @@ namespace Map
             UpdateNeighbours(worldPosition);
             return true;  
         }
-
-        internal void DespawnChunk(Chunk chunk)
+        public void DespawnChunk(Chunk chunk)
         {
             //save changes
             FakeSaveSystem.Instance.SaveData(chunk.Position, chunk.changedNodesData.ToArray());
-            //Debug.Log("disabling chunk at position " + chunk.Position* 16);
             List<Vector3Int> positionToDestroy = new();
             foreach (var item in chunk.showedNodes)
             {
-                positionToDestroy.Add(new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + MapDataProvider.GetPositionInChunk(item));
-                
+                positionToDestroy.Add(new Vector3Int(chunk.Position.x << 4, 0, chunk.Position.y << 4) + MapDataProvider.GetPositionInChunk(item));                
             }
             blockPool.DisableCubeAsync(positionToDestroy);
         }
-
-        internal GameObject GetCubeGameObject(Vector3Int worldPosition)
+        public GameObject GetCubeGameObject(Vector3Int worldPosition)
         {
             return blockPool.GetGameObject(worldPosition);
         }

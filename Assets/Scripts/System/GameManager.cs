@@ -8,19 +8,22 @@ namespace Core
 {
     public class GameManager : MonoBehaviour
     {
+        #region  VARIABLES
         [SerializeField] private GameObject playerGameObject;
         [SerializeField] private LayerMask layerMaskForPlayerSpawn;
         private MapManager mapManager;
         private const float playerPositionCheckingTime = 2f;
         private Vector2Int playerChunkPosition;
-        private int generatedRadius = 4;
-       
+        private int generatedRadius = 4;       
+        #endregion
+
         public void StartWorld(int seed)
         {
             mapManager = new MapManager(seed, generatedRadius);            
-            mapManager.StartMap(playerChunkPosition, star);
+            mapManager.StartMap(playerChunkPosition, CreatePlayer);
         }
-        private void star()
+        //this is for load scene, not best solution
+        private void CreatePlayer()
         {
             Invoke("SpawnPlayer", 2f);
         }
@@ -37,6 +40,7 @@ namespace Core
 
             StartCoroutine(CheckPlayerChunkPosition());
         }
+        //check if player change chunk, its for procedural generator
         private IEnumerator CheckPlayerChunkPosition()
         {
             var wait = new WaitForSeconds(playerPositionCheckingTime);

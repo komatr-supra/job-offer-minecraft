@@ -1,14 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+
+//this is database, used for save and chunk data(int can be saved, and this is ushort -> small)
 public class FakeDatabase : MonoBehaviour
 {
     [SerializeField] private BiomesSO[] biomes;
     [SerializeField] private BlocksSO[] blocks;
     //just for test use!!! public access
     public BiomesSO selectedBiome;
-
+    [SerializeField] private GameObject dropPrefab;
+    public GameObject DropPrefab => dropPrefab;
     //dont know if it is a good way all block is here, must track it, but reference is only int(ushort)
     public static FakeDatabase Instance;
     private void Awake()
@@ -21,8 +21,6 @@ public class FakeDatabase : MonoBehaviour
         Instance = this;
     }
     public BiomesSO[] GetBiomes() => biomes;
-
-
     public BlocksSO GetBlock(Block blockEnum)
     {
         return blocks[(int)blockEnum];
@@ -39,7 +37,7 @@ public class FakeDatabase : MonoBehaviour
 public enum Block
     {
         //its for human use only -> its indexes of blockData
-        //trying make minimal cube data
+        //trying make minimal cube data... its not best...
         none,
         Dirt,
         Stone,
@@ -48,9 +46,4 @@ public enum Block
         Sand,
         MountainStone,
         Grass2
-    }
-    public enum Biome
-    {
-        Plains,
-        Hills
     }

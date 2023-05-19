@@ -21,8 +21,6 @@ namespace Map
         public MapManager(int seed, int mapDrawRadius)
         {            
             //seed handle its basicly map start position in perlin noise => map is  done
-            //save only changes?
-            //TODO this was changed in UI
             if(seed == -1) seed = (int)(System.DateTime.Now.Ticks);
             UnityEngine.Random.InitState(seed);
             //this is for save -> recreate the perlin noise
@@ -66,12 +64,15 @@ namespace Map
             //bottom limit... looks like digging, but no action at the end is changed
             if(worldPosition.y == 0) return false;
             //set data(clear)
+            GameObject drop = GameObject.Instantiate(FakeDatabase.Instance.DropPrefab, worldPosition, Quaternion.identity);
+            drop.GetComponent<Drop>().Init(mapDataProvider.GetBlockDatas(worldPosition).blockSO);
             var clearBlock = FakeDatabase.Instance.GetBlock(Block.none);
             if(mapDataProvider.SetBlockData(worldPosition, clearBlock))
             {   
                 selectedCube.GetComponent<MeshRenderer>().material.color = Color.white;
+                //create drop
                 return worldConstructor.DestroyBlock(worldPosition);
-            }            
+            }
             return false;
         }
 
